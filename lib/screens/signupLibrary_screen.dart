@@ -109,7 +109,30 @@ class _signupLibState extends State<signupLib> {
       locationbuttontxt = await Provider.of<locationinfo>(context,
               listen: false)
           .getPlaceAddress(_PickedLocation.latitude, _PickedLocation.longitude);
-      locationtext = locationbuttontxt;
+      if (locationbuttontxt == null) {
+        setState(() {
+          locationbuttontxt='Location';
+          isloading = false;
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Error !'),
+                  content: Text('No internet connection , try again later'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('Ok'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
+                );
+              });
+        });
+      } else {
+        locationtext = locationbuttontxt;
+      }
     }
     isloading = false;
   }
