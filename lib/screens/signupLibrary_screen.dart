@@ -34,42 +34,84 @@ class _signupLibState extends State<signupLib> {
   LatLng _PickedLocation;
   String locationtext = '';
   var isloading = false;
+  var currentLocData;
+  Location location = new Location();
+
+  bool _serviceEnabled;
+  PermissionStatus _permissionGranted;
+  LocationData _locationData;
 
   Future<void> selectLocationonmap(BuildContext context) async {
-    try{isloading = true;
-    var currentLocData = await Location().getLocation();
+    isloading = true;
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        setState(() {
+          isloading = false;
+        });
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error !'),
+                content: Text('Location is disabled , try again later'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Ok'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            });
+        return;
+      }
+    }
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.DENIED) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.GRANTED) {
+        setState(() {
+          isloading = false;
+        });
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error !'),
+                content: Text('Permission denied, try again later'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Ok'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            });
+        return;
+      }
+    }
+
+    currentLocData = await Location().getLocation();
+
     _PickedLocation = await Navigator.of(context).push(MaterialPageRoute(
         fullscreenDialog: true,
         builder: (ctx) => MapScreen(
-          initialLocationLat: currentLocData.latitude,
-          initialLocationLng: currentLocData.longitude,
-          isSelecting: true,
-        )));
+              initialLocationLat: currentLocData.latitude,
+              initialLocationLng: currentLocData.longitude,
+              isSelecting: true,
+            )));
     if (_PickedLocation != null) {
       locationbuttontxt = await Provider.of<locationinfo>(context,
-          listen: false)
+              listen: false)
           .getPlaceAddress(_PickedLocation.latitude, _PickedLocation.longitude);
       locationtext = locationbuttontxt;
     }
-    isloading = false;}
-    catch(error){
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Error !'),
-              content: Text('Some error happened , try again later'),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('Ok'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          });
-    }
+    isloading = false;
   }
 
   void _submit() {
