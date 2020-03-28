@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import './login_screen.dart';
 import './signupLibrary_screen.dart';
 import './signupBorrower.dart';
@@ -48,144 +48,158 @@ class _OpeningState extends State<Opening> {
   Widget build(BuildContext context) {
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
+    ScreenUtil.init(
+      context,
+      allowFontScaling: true,
+      width: 400,
+      height: 810,
+    );
+
     return Scaffold(
       backgroundColor: Color.fromRGBO(255, 255, 255, 1),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              Container(
-                height: h * .9,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      child: Text(
-                        'Logo',
-                        style: TextStyle(fontSize: 29),
-                      ),
-                      height: h * 0.0625,
-                      margin: EdgeInsets.fromLTRB(0, h * 0.15, 0, 0),
-                    ),
-                    CarouselSlider.builder(
-                        height: h * .45,
-                        viewportFraction: 1.0,
-                        itemCount: 3,
-                        onPageChanged: ((index) {
-                          setState(() {
-                            _current = index;
-                          });
-                        }),
-                        itemBuilder: (ctx, index) {
-                          return carouseItem(
-                              ctx, imgs[index], titles[index], descs[index]);
-                        }),
-                    DotsIndicator(
-                      dotsCount: 3,
-                      position: _current.toDouble(),
-                      decorator: DotsDecorator(
-                          activeColor: Theme.of(context).primaryColor),
-                    ),
-                    buildButtonTheme(w, h, context, 'Login', loginFunction),
-                    Row(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Flexible(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: ScreenUtil().setWidth(double.infinity),
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(
-                          'Not Registered ?',
-                          style: TextStyle(
-                              color: Color.fromRGBO(136, 98, 4, 1),
-                              fontSize: 15),
+                        Container(
+                            child: Text(
+                              'Logo',
+                              style:
+                                  TextStyle(fontSize: ScreenUtil().setSp(28)),
+                            ),
+                            height: ScreenUtil().setHeight(50),
+                            margin: EdgeInsets.fromLTRB(
+                                0, ScreenUtil().setHeight(32), 0, 0)),
+                        CarouselSlider.builder(
+                            height: ScreenUtil().setHeight(350),
+                            viewportFraction: 1.0,
+                            itemCount: 3,
+                            onPageChanged: ((index) {
+                              setState(() {
+                                _current = index;
+                              });
+                            }),
+                            itemBuilder: (ctx, index) {
+                              return carouseItem(ctx, imgs[index],
+                                  titles[index], descs[index]);
+                            }),
+                        DotsIndicator(
+                          dotsCount: 3,
+                          position: _current.toDouble(),
+                          decorator: DotsDecorator(
+                              activeColor: Theme.of(context).primaryColor),
                         ),
-                        InkWell(
-                          onTap: () {
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (_) {
-                                  return Container(
-                                    height: 190,
-                                    padding: EdgeInsets.all(25),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: <Widget>[
-                                        buildButtonTheme(w, h, context,
-                                            'Borrower', _gotosignupBorrower),
-                                        Text('or'),
-                                        buildButtonTheme(w, h, context,
-                                            'Library', _gotosignupLib),
-                                      ],
-                                    ),
-                                  );
-                                });
-                          },
-                          child: Text('Sign up',
+                        buildButtonTheme(context, 'Login', loginFunction),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              'Not Registered ?',
                               style: TextStyle(
                                   color: Color.fromRGBO(136, 98, 4, 1),
-                                  fontSize: 15,
-                                  decoration: TextDecoration.underline)),
+                                  fontSize: ScreenUtil().setSp(15)),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                showModalBottomSheet(
+                                    context: context,
+                                    builder: (_) {
+                                      return Container(
+                                        height: ScreenUtil().setHeight(200),
+                                        padding: EdgeInsets.all(
+                                            ScreenUtil().setHeight(5)),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            buildButtonTheme(
+                                                context,
+                                                'Borrower',
+                                                _gotosignupBorrower),
+                                            Text('or'),
+                                            buildButtonTheme(context, 'Library',
+                                                _gotosignupLib),
+                                          ],
+                                        ),
+                                      );
+                                    });
+                              },
+                              child: Text('Sign up',
+                                  style: TextStyle(
+                                      color: Color.fromRGBO(136, 98, 4, 1),
+                                      fontSize: ScreenUtil().setSp(15),
+                                      decoration: TextDecoration.underline)),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Container(
-                height: h * .07,
-                child: Stack(
-                  children: <Widget>[
-                    Positioned(
-                      child: InkWell(
-                        child: Text(
-                          'Skip',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Color.fromRGBO(136, 98, 4, 1),
-                          ),
-                        ),
-                        onTap: () {},
-                      ),
-                      right: w * .05,
-                      bottom: h * .01,
-                    )
-                  ],
+            ),
+            Container(
+              height: ScreenUtil().setHeight(20),
+              alignment: Alignment.centerRight,
+              margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              child: InkWell(
+                child: Text(
+                  'Skip',
+                  style: TextStyle(
+                    fontSize: ScreenUtil().setSp(18),
+                    color: Color.fromRGBO(136, 98, 4, 1),
+                  ),
                 ),
-              )
-            ],
-          ),
+                onTap: () {},
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget carouseItem(BuildContext ctx, String img, String title, String info) {
-    final h = MediaQuery.of(ctx).size.height;
-    final w = MediaQuery.of(ctx).size.width;
     return Column(
       children: <Widget>[
         SizedBox(
-          width: w,
-          height: h * .26,
+          width: ScreenUtil().setWidth(double.infinity),
+          height: ScreenUtil().setHeight(231),
           child: ClipRect(
             child: Image.asset(
               img,
             ),
           ),
         ),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
+        Container(
+          height: ScreenUtil().setHeight(43),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: ScreenUtil().setSp(24),
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
           ),
-          textAlign: TextAlign.center,
         ),
         Container(
-          height: h * 0.06875,
-          width: w * 0.6861,
+          height: ScreenUtil().setHeight(68),
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          width: ScreenUtil().setWidth(double.infinity),
           child: Text(
             info,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: ScreenUtil().setSp(18),
             ),
             textAlign: TextAlign.center,
           ),
@@ -194,19 +208,20 @@ class _OpeningState extends State<Opening> {
     );
   }
 
-  Widget buildButtonTheme(
-      double w, double h, BuildContext context, String txt, Function ToDo) {
+  Widget buildButtonTheme(BuildContext context, String txt, Function ToDo) {
     return Container(
       margin: EdgeInsets.all(5),
       child: ButtonTheme(
-        minWidth: w * .6,
-        height: 38,
+        minWidth: ScreenUtil().setWidth(220),
+        height: ScreenUtil().setHeight(38),
         child: FlatButton(
           onPressed: ToDo,
           child: Text(
             txt,
             style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: ScreenUtil().setSp(18),
+                fontWeight: FontWeight.bold),
           ),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),

@@ -45,6 +45,7 @@ class _signupLibState extends State<signupLib> {
   bool _serviceEnabled;
   PermissionStatus _permissionGranted;
   LocationData _locationData;
+
   Future<void> _takephoto() async {
     _pickedimage = await ImagePicker.pickImage(
       source: ImageSource.gallery,
@@ -128,7 +129,7 @@ class _signupLibState extends State<signupLib> {
           .getPlaceAddress(_PickedLocation.latitude, _PickedLocation.longitude);
       if (locationbuttontxt == null) {
         setState(() {
-          locationbuttontxt='Location';
+          locationbuttontxt = 'Location';
           isloading = false;
           showDialog(
               context: context,
@@ -187,9 +188,10 @@ class _signupLibState extends State<signupLib> {
       body: Form(
           key: _formKey,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Expanded(
+              Flexible(
                   child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -444,16 +446,18 @@ class _signupLibState extends State<signupLib> {
                               }).toList(),
                             ),
                           ),
-                        ),                                SizedBox(
+                        ),
+                        SizedBox(
                           height: 15,
-                        ),                InkWell(
+                        ),
+                        InkWell(
                           onTap: _takephoto,
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 32),
                             child: Material(
                               elevation: 2.0,
                               borderRadius:
-                              BorderRadius.all(Radius.circular(30)),
+                                  BorderRadius.all(Radius.circular(30)),
                               child: TextFormField(
                                 enabled: false,
                                 onSaved: (value) {
@@ -464,11 +468,11 @@ class _signupLibState extends State<signupLib> {
                                 decoration: InputDecoration(
                                     labelText: photobuttontxt,
                                     labelStyle:
-                                    TextStyle(color: Colors.blueGrey),
+                                        TextStyle(color: Colors.blueGrey),
                                     prefixIcon: Material(
                                       elevation: 0,
                                       borderRadius:
-                                      BorderRadius.all(Radius.circular(30)),
+                                          BorderRadius.all(Radius.circular(30)),
                                     ),
                                     border: InputBorder.none,
                                     contentPadding: EdgeInsets.symmetric(

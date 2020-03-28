@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import './signupLibrary_screen.dart';
 import './signupBorrower.dart';
+
 class LoginScreen extends StatefulWidget {
   static final String routeName = "/login";
 
@@ -86,136 +87,145 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32),
-              child: Material(
-                elevation: 2.0,
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-                child: TextFormField(
-                  validator: (value) {
-                    if (value.isEmpty || !value.contains('@')) {
-                      return 'Invalid email!';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _authData['email'] = value;
-                  },
-                  decoration: InputDecoration(
-                      labelText: "Email",
-                      labelStyle: TextStyle(color: Colors.blueGrey),
-                      prefixIcon: Material(
-                        elevation: 0,
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        child: Icon(
-                          Icons.email,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                      border: InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 25, vertical: 13)),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32),
-              child: Material(
-                elevation: 2.0,
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-                child: TextFormField(
-                  obscureText: true,
-                  validator: (value) {
-                    if (value.isEmpty || value.length < 5) {
-                      return 'Password is too short!';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _authData['password'] = value;
-                  },
-                  decoration: InputDecoration(
-                      labelStyle: TextStyle(color: Colors.blueGrey),
-                      labelText: "Password",
-                      prefixIcon: Material(
-                        elevation: 0,
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        child: Icon(
-                          Icons.lock,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                      border: InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 25, vertical: 13)),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32),
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(100)),
-                      color: Theme.of(context).primaryColor),
-                  child: FlatButton(
-                    child: Text(
-                      "Login",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18),
-                    ),
-                    onPressed: _submit,
-                  ),
-                )),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Column(
               children: <Widget>[
-                Text(
-                  "Don't have an Account ? ",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal),
-                ),
-                InkWell(
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (_) {
-                          return Container(
-                            height: 190,
-                            padding: EdgeInsets.all(25),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: <Widget>[
-                                buildButtonTheme(
-                                    w, h, context, 'Borrower', _gotosignupBorrower),
-                                Text('or'),
-                                buildButtonTheme(
-                                    w, h, context, 'Library', _gotosignupLib),
-                              ],
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 32),
+                  child: Material(
+                    elevation: 2.0,
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value.isEmpty || !value.contains('@')) {
+                          return 'Invalid email!';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _authData['email'] = value;
+                      },
+                      decoration: InputDecoration(
+                          labelText: "Email",
+                          labelStyle: TextStyle(color: Colors.blueGrey),
+                          prefixIcon: Material(
+                            elevation: 0,
+                            borderRadius: BorderRadius.all(Radius.circular(30)),
+                            child: Icon(
+                              Icons.email,
+                              color: Theme.of(context).primaryColor,
                             ),
-                          );
-                        });
-                  },
-                  child: Text('Sign up',
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 25, vertical: 13)),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 32),
+                  child: Material(
+                    elevation: 2.0,
+                    borderRadius: BorderRadius.all(Radius.circular(30)),
+                    child: TextFormField(
+                      obscureText: true,
+                      validator: (value) {
+                        if (value.isEmpty || value.length < 5) {
+                          return 'Password is too short!';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _authData['password'] = value;
+                      },
+                      decoration: InputDecoration(
+                          labelStyle: TextStyle(color: Colors.blueGrey),
+                          labelText: "Password",
+                          prefixIcon: Material(
+                            elevation: 0,
+                            borderRadius: BorderRadius.all(Radius.circular(30)),
+                            child: Icon(
+                              Icons.lock,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 25, vertical: 13)),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  width: ScreenUtil().setWidth(355),
+                  child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 32),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(100)),
+                            color: Theme.of(context).primaryColor),
+                        child: FlatButton(
+                          child: Text(
+                            "Login",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18),
+                          ),
+                          onPressed: _submit,
+                        ),
+                      )),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "Don't have an Account ? ",
                       style: TextStyle(
-                          color: Color.fromRGBO(136, 98, 4, 1),
-                          fontSize: 15,
-                          decoration: TextDecoration.underline)),
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (_) {
+                              return Container(
+                                height: ScreenUtil().setHeight(200),
+                                padding:
+                                    EdgeInsets.all(ScreenUtil().setHeight(5)),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    buildButtonTheme(context, 'Borrower',
+                                        _gotosignupBorrower),
+                                    Text('or'),
+                                    buildButtonTheme(
+                                        context, 'Library', _gotosignupLib),
+                                  ],
+                                ),
+                              );
+                            });
+                      },
+                      child: Text('Sign up',
+                          style: TextStyle(
+                              color: Color.fromRGBO(136, 98, 4, 1),
+                              fontSize: ScreenUtil().setSp(15),
+                              decoration: TextDecoration.underline)),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
                 ),
               ],
             )
@@ -225,19 +235,20 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget buildButtonTheme(
-      double w, double h, BuildContext context, String txt, Function ToDo) {
+  Widget buildButtonTheme(BuildContext context, String txt, Function ToDo) {
     return Container(
       margin: EdgeInsets.all(5),
       child: ButtonTheme(
-        minWidth: w * .6,
-        height: 38,
+        minWidth: ScreenUtil().setWidth(220),
+        height: ScreenUtil().setHeight(38),
         child: FlatButton(
           onPressed: ToDo,
           child: Text(
             txt,
             style: TextStyle(
-                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontSize: ScreenUtil().setSp(18),
+                fontWeight: FontWeight.bold),
           ),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
@@ -257,6 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
   _gotosignupLib() {
     Navigator.of(context).pushNamed(signupLib.routeName);
   }
+
   _gotosignupBorrower() {
     Navigator.of(context).pushNamed(signupBorrower.routeName);
   }
