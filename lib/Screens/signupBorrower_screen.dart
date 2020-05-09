@@ -1,50 +1,30 @@
-import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:path/path.dart' as path;
-import 'package:image_picker/image_picker.dart';
-import 'package:location/location.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
-import '../Providers/location_provider.dart';
-import './map_screen.dart';
 import '../widgets/addPhoto_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
 
-// ignore: camel_case_types
-class signupLib extends StatefulWidget {
-  static final String routeName = "/signuplib";
+class signupBorrower extends StatefulWidget {
+  static final String routeName = "/signupBorrower";
 
   @override
-  _signupLibState createState() => _signupLibState();
+  _signupBorrowerState createState() => _signupBorrowerState();
 }
 
-// ignore: camel_case_types
-class _signupLibState extends State<signupLib> {
+class _signupBorrowerState extends State<signupBorrower> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   Map<String, Object> _authData = {
     'email': '',
     'password': '',
-    'libname': '',
+    'username': '',
     'mobile': '',
     'governorate': '',
-    'locationlat': '',
-    'locationlng': '',
-    'locationtxt': '',
     'profilephoto': '',
   };
   List<String> Governorates = ['Gharbia', 'Qna', 'Luxor', 'Dummy'];
-  File _pickedimage;
   var _goverval;
-  var locationbuttontxt = 'Location';
-  LatLng _PickedLocation;
-  String locationtext = '';
-  var isloading = false;
-  var currentLocData;
-  Location location = new Location();
-
-  bool _serviceEnabled;
-  PermissionStatus _permissionGranted;
-  LocationData _locationData;
+  File _pickedimage;
 
   Future<void> _takephoto() async {
     _pickedimage = await ImagePicker.pickImage(
@@ -59,111 +39,15 @@ class _signupLibState extends State<signupLib> {
     }
   }
 
-  Future<void> selectLocationonmap(BuildContext context) async {
-    isloading = true;
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        setState(() {
-          isloading = false;
-        });
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Error !'),
-                content: Text('Location is disabled , try again later'),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text('Ok'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              );
-            });
-        return;
-      }
-    }
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.DENIED) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.GRANTED) {
-        setState(() {
-          isloading = false;
-        });
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Error !'),
-                content: Text('Permission denied, try again later'),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text('Ok'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              );
-            });
-        return;
-      }
-    }
-
-    currentLocData = await Location().getLocation();
-
-    _PickedLocation = await Navigator.of(context).push(MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (ctx) => MapScreen(
-              initialLocationLat: currentLocData.latitude,
-              initialLocationLng: currentLocData.longitude,
-              isSelecting: true,
-            )));
-    if (_PickedLocation != null) {
-      locationbuttontxt = await Provider.of<locationinfo>(context,
-              listen: false)
-          .getPlaceAddress(_PickedLocation.latitude, _PickedLocation.longitude);
-      if (locationbuttontxt == null) {
-        setState(() {
-          locationbuttontxt = 'Location';
-          isloading = false;
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Error !'),
-                  content: Text('No internet connection , try again later'),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text('Ok'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    )
-                  ],
-                );
-              });
-        });
-      } else {
-        locationtext = locationbuttontxt;
-      }
-    }
-    isloading = false;
-  }
-
   void _submit() {
     if (_formKey.currentState.validate()) {
-      if (_PickedLocation == null) {
+      if (_pickedimage == null) {
         showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text('Missing Data'),
-                content: Text('Please choose your library location !'),
+                content: Text('Please choose your profile picture !'),
                 actions: <Widget>[
                   FlatButton(
                     child: Text('Ok'),
@@ -175,26 +59,7 @@ class _signupLibState extends State<signupLib> {
               );
             });
       } else {
-        if (_pickedimage == null) {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Missing Data'),
-                  content: Text('Please choose your profile picture !'),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text('Ok'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    )
-                  ],
-                );
-              });
-        } else {
-          _formKey.currentState.save();
-        }
+        _formKey.currentState.save();
       }
     }
   }
@@ -275,15 +140,15 @@ class _signupLibState extends State<signupLib> {
                             child: TextFormField(
                               validator: (value) {
                                 if (value.isEmpty) {
-                                  return 'Enter Library name';
+                                  return 'Enter your name';
                                 }
                                 return null;
                               },
                               onSaved: (value) {
-                                _authData['libname'] = value;
+                                _authData['username'] = value;
                               },
                               decoration: InputDecoration(
-                                  labelText: "Library name",
+                                  labelText: "User Name",
                                   labelStyle: TextStyle(color: Colors.blueGrey),
                                   prefixIcon: Material(
                                     elevation: 0,
@@ -473,57 +338,6 @@ class _signupLibState extends State<signupLib> {
                         ),
                         SizedBox(
                           height: 15,
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Consumer<locationinfo>(
-                          builder: (ctx, locationinfo, _) {
-                            return isloading == true
-                                ? CircularProgressIndicator()
-                                : InkWell(
-                                    onTap: () {
-                                      selectLocationonmap(context);
-                                      setState(() {});
-                                    },
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 32),
-                                      child: Material(
-                                        elevation: 2.0,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(30)),
-                                        child: TextFormField(
-                                          enabled: false,
-                                          onSaved: (value) {
-                                            if (_PickedLocation != null) {
-                                              _authData['locationlat'] =
-                                                  _PickedLocation.latitude;
-                                              _authData['locationlng'] =
-                                                  _PickedLocation.longitude;
-                                              _authData['locationtxt'] =
-                                                  locationtext;
-                                            }
-                                          },
-                                          decoration: InputDecoration(
-                                              labelText: locationbuttontxt,
-                                              labelStyle: TextStyle(
-                                                  color: Colors.blueGrey),
-                                              prefixIcon: Material(
-                                                elevation: 0,
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(30)),
-                                              ),
-                                              border: InputBorder.none,
-                                              contentPadding:
-                                                  EdgeInsets.symmetric(
-                                                      horizontal: 25,
-                                                      vertical: 10)),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                          },
                         ),
                         SizedBox(
                           height: 15,

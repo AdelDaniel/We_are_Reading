@@ -5,7 +5,8 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import './login_screen.dart';
 import './signupLibrary_screen.dart';
-import './signupBorrower.dart';
+import './signupBorrower_screen.dart';
+import './navigation_screen.dart';
 
 class Opening extends StatefulWidget {
   @override
@@ -159,7 +160,9 @@ class _OpeningState extends State<Opening> {
                     color: Color.fromRGBO(136, 98, 4, 1),
                   ),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushNamed(FancyBottomBarPage.routeName);
+                },
               ),
             ),
           ],
