@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:graduation/providers/auth.dart';
+import 'package:graduation/providers/global_data.dart';
 import 'package:provider/provider.dart';
 
 import './Providers/book_provider.dart';
@@ -21,6 +23,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<Auth>(
+          create: (_) => Auth(),
+        ),
+        ChangeNotifierProxyProvider<Auth, GlobalData>(
+          update: (_, auth, previous) => GlobalData(
+            auth.user,
+            previous?.cities ?? [],
+          ),
+        ),
         ChangeNotifierProvider.value(value: locationinfo()),
         ChangeNotifierProvider<LibraryProvider>(
           create: (context) => LibraryProvider(),

@@ -1,29 +1,35 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:graduation/mixin/alerts_mixin.dart';
+import 'package:graduation/models/city.dart';
+import 'package:graduation/providers/auth.dart';
+import 'package:graduation/providers/global_data.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/add_photo_widget.dart';
 
 class SignUpBorrower extends StatefulWidget {
-  static final String routeName = "/signupBorrower";
+  static final String routeName = "/sign-up-borrower";
 
   @override
   _SignUpBorrowerState createState() => _SignUpBorrowerState();
 }
 
-class _SignUpBorrowerState extends State<SignUpBorrower> {
+class _SignUpBorrowerState extends State<SignUpBorrower> with AlertsMixin {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
-  Map<String, Object> _authData = {
-    'email': '',
-    'password': '',
+  Map<String, dynamic> _authData = {
+    'fullname' : '',
     'username': '',
-    'mobile': '',
-    'governorate': '',
-    'profilephoto': '',
+    'email': '',
+    'phoneNumber': '',
+    'password': '',
+    'confirmPassword' : '',
+    'roleId' : 1
   };
-  List<String> Governorates = ['Gharbia', 'Qna', 'Luxor', 'Dummy'];
   var _goverval;
   File _pickedimage;
 
@@ -39,29 +45,75 @@ class _SignUpBorrowerState extends State<SignUpBorrower> {
       });
     }
   }
+  bool _isLoading = false;
 
-  void _submit() {
+  Future<void> _register() async {
     if (_formKey.currentState.validate()) {
-      if (_pickedimage == null) {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Missing Data'),
-                content: Text('Please choose your profile picture !'),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text('Ok'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              );
-            });
-      } else {
-        _formKey.currentState.save();
+      if(false) {
+
       }
+//      if (_pickedimage == null) {
+//        showDialog(
+//            context: context,
+//            builder: (BuildContext context) {
+//              return AlertDialog(
+//                title: Text('Missing Data'),
+//                content: Text('Please choose your profile picture !'),
+//                actions: <Widget>[
+//                  FlatButton(
+//                    child: Text('Ok'),
+//                    onPressed: () {
+//                      Navigator.of(context).pop();
+//                    },
+//                  )
+//                ],
+//              );
+//            });
+//      }
+      else {
+        _formKey.currentState.save();
+        setState(() {
+          _isLoading = true;
+        });
+        try {
+
+              await Provider.of<Auth>(context, listen: false).register(_authData);
+//          final parsedRegResponse = json.decode(regResponse);
+//          print(parsedRegResponse);
+//          Navigator.of(context).pushNamedAndRemoveUntil(
+//              MainScreen.routeName, (route) => false);
+          _isLoading = false;
+        } on HttpException catch (error) {
+          _isLoading = false;
+          showErrorDialog(
+              context, error.toString(), Duration(milliseconds: 1500));
+        } catch (error) {
+          _isLoading = false;
+          throw error;
+        }
+        setState(() {});
+      }
+    }
+  }
+
+  GlobalData _globalDataReference;
+
+  @override
+  void didChangeDependencies() {
+    _globalDataReference = Provider.of<GlobalData>(context, listen: false);
+    if (_globalDataReference.cities == null ||
+        _globalDataReference.cities.length == 0) {
+      _getCities();
+    }
+    super.didChangeDependencies();
+  }
+  Future<void> _getCities() async {
+    try {
+      await _globalDataReference.fetchCities();
+    } on HttpException catch (e) {
+      showErrorDialog(context, e.toString());
+    } catch (e) {
+      throw e;
     }
   }
 
@@ -147,6 +199,7 @@ class _SignUpBorrowerState extends State<SignUpBorrower> {
                               },
                               onSaved: (value) {
                                 _authData['username'] = value;
+                                _authData['fullname'] = value;
                               },
                               decoration: InputDecoration(
                                   labelText: "User Name",
@@ -243,6 +296,9 @@ class _SignUpBorrowerState extends State<SignUpBorrower> {
                                 }
                                 return null;
                               },
+                              onSaved: (value) {
+                                _authData['confirmPassword'] = value;
+                              },
                               obscureText: true,
                               cursorColor: Colors.deepOrange,
                               decoration: InputDecoration(
@@ -275,7 +331,7 @@ class _SignUpBorrowerState extends State<SignUpBorrower> {
                                 return null;
                               },
                               onSaved: (value) {
-                                _authData['mobile'] = value;
+                                _authData['phoneNumber'] = value;
                               },
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
@@ -300,40 +356,43 @@ class _SignUpBorrowerState extends State<SignUpBorrower> {
                           child: Material(
                             elevation: 2.0,
                             borderRadius: BorderRadius.all(Radius.circular(30)),
-                            child: DropdownButtonFormField(
-                              validator: (val) {
-                                if (val == null) {
-                                  return 'Choose Your Governorate';
-                                }
-                                return null;
-                              },
-                              onSaved: (val) {
-                                _authData['governorate'] = val;
-                              },
-                              onChanged: (val) {
-                                setState(() {
-                                  _goverval = val;
-                                  print(_goverval);
-                                });
-                              },
-                              value: _goverval,
-                              decoration: InputDecoration(
-                                  labelText: "Governorate",
-                                  labelStyle: TextStyle(color: Colors.blueGrey),
-                                  prefixIcon: Material(
-                                    elevation: 0,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(30)),
-                                  ),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 25, vertical: 1)),
-                              items: Governorates.map((val) {
-                                return DropdownMenuItem(
-                                  child: Text(val),
-                                  value: val,
-                                );
-                              }).toList(),
+                            child: Selector<GlobalData, List<City>>(
+                              selector: (_, globalData) => globalData.cities,
+                              builder: (_, cities, __) =>  DropdownButtonFormField(
+                                validator: (val) {
+                                  if (val == null) {
+                                    return 'Choose Your Governorate';
+                                  }
+                                  return null;
+                                },
+                                onSaved: (val) {
+                                  _authData['governmentId'] = val;
+                                },
+                                onChanged: (val) {
+                                  setState(() {
+                                    _goverval = val;
+                                    print(_goverval);
+                                  });
+                                },
+                                value: _goverval,
+                                decoration: InputDecoration(
+                                    labelText: "Governorate",
+                                    labelStyle: TextStyle(color: Colors.blueGrey),
+                                    prefixIcon: Material(
+                                      elevation: 0,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(30)),
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 25, vertical: 1)),
+                                items: cities.map((val) {
+                                  return DropdownMenuItem(
+                                    child: Text(val.name),
+                                    value: val.id,
+                                  );
+                                }).toList(),
+                              ),
                             ),
                           ),
                         ),
@@ -363,7 +422,7 @@ class _SignUpBorrowerState extends State<SignUpBorrower> {
                             fontWeight: FontWeight.w700,
                             fontSize: 18),
                       ),
-                      onPressed: _submit,
+                      onPressed: _register,
                     ),
                   )),
             ],
