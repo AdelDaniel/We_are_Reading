@@ -1,18 +1,18 @@
-import 'package:device_simulator/device_simulator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import './Screens/navigation_screen.dart';
-import './Screens/opening_screen.dart';
-import './Screens/profile_screen.dart';
-import './screens/login_screen.dart';
-import './Screens/add_book_screen.dart';
-import './screens/signupLibrary_screen.dart';
-import './Screens/signupBorrower_screen.dart';
-import './Screens/After_Request_From_Lib_Screen.dart';
-import './Providers/location_provider.dart';
+
 import './Providers/book_provider.dart';
-import './Providers/user_provider.dart';
 import './Providers/library_provider.dart';
+import './Providers/location_provider.dart';
+import './Providers/user_provider.dart';
+import './screens/add_book_screen.dart';
+import './screens/after_request_from_lib_screen.dart';
+import './screens/login_screen.dart';
+import './screens/navigation_screen.dart';
+import './screens/opening_screen.dart';
+import './screens/profile_screen.dart';
+import './screens/signup_borrower_screen.dart';
+import './screens/signup_library_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -48,11 +48,11 @@ class MyApp extends StatelessWidget {
         home: Opening(),
         routes: {
           LoginScreen.routeName: (context) => LoginScreen(),
-          signupLib.routeName: (context) => signupLib(),
-          signupBorrower.routeName: (context) => signupBorrower(),
+          SignupLib.routeName: (context) => SignupLib(),
+          SignUpBorrower.routeName: (context) => SignUpBorrower(),
           ProfileScreen.routeName: (context) => ProfileScreen(),
           AddBookScreen.routename: (context) => AddBookScreen(),
-          afterborrowScreen.routeName: (context) => afterborrowScreen(),
+          AfterBorrowScreen.routeName: (context) => AfterBorrowScreen(),
           FancyBottomBarPage.routeName: (context) => FancyBottomBarPage(),
         },
       ),

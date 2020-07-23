@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import './signupLibrary_screen.dart';
-import './signupBorrower_screen.dart';
+
+import './signup_borrower_screen.dart';
+import './signup_library_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static final String routeName = "/login";
@@ -266,11 +267,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   _gotosignupLib() {
-    Navigator.of(context).pushNamed(signupLib.routeName);
+    Navigator.of(context).pushNamed(SignupLib.routeName);
   }
 
   _gotosignupBorrower() {
-    Navigator.of(context).pushNamed(signupBorrower.routeName);
+    Navigator.of(context).pushNamed(SignUpBorrower.routeName);
   }
 }
 

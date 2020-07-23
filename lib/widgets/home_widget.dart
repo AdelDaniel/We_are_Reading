@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../Screens/After_Request_From_Lib_Screen.dart';
 
+import '../screens/after_request_from_lib_screen.dart';
 
 class BookItem extends StatelessWidget {
 //  final String id;
@@ -31,7 +31,7 @@ class BookItem extends StatelessWidget {
       height: defaultScreenHeight,
     );
 
-    return   Container(
+    return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -39,8 +39,7 @@ class BookItem extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                margin: EdgeInsets.only(
-                    bottom: ScreenUtil().setHeight(5)),
+                margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(5)),
                 width: ScreenUtil().setWidth(183),
                 //height: ScreenUtil().setHeight(250),
                 //color: Colors.deepPurple,
@@ -62,41 +61,35 @@ class BookItem extends StatelessWidget {
                       child: Container(
                         color: Color.fromRGBO(255, 255, 255, .8),
                         child: Row(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.center,
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
                             IconButton(
                                 icon: Icon(Icons.favorite_border),
                                 onPressed: null),
                             Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
                                   'الطنطورية',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
-                                          allowFontScalingSelf:
-                                          true)),
+                                          allowFontScalingSelf: true)),
                                 ),
                                 Text(
                                   'رضوى عاشور',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
-                                          allowFontScalingSelf:
-                                          true)),
+                                          allowFontScalingSelf: true)),
                                 ),
                                 Text(
                                   'عدد النسخ : 5',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
-                                          allowFontScalingSelf:
-                                          true)),
+                                          allowFontScalingSelf: true)),
                                 ),
                               ],
                             ),
@@ -120,8 +113,8 @@ class BookItem extends StatelessWidget {
                     child: Text(
                       'Reviews',
                       style: TextStyle(
-                        fontSize: ScreenUtil()
-                            .setSp(12, allowFontScalingSelf: true),
+                        fontSize:
+                            ScreenUtil().setSp(12, allowFontScalingSelf: true),
                         color: Color.fromRGBO(255, 255, 255, 1),
                       ),
                     ),
@@ -137,7 +130,8 @@ class BookItem extends StatelessWidget {
                 Flexible(
                   child: RaisedButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed(afterborrowScreen.routeName);
+                      Navigator.of(context)
+                          .pushNamed(AfterBorrowScreen.routeName);
                     },
                     child: Text(
                       'Borrow',
@@ -158,33 +152,8 @@ class BookItem extends StatelessWidget {
         ],
       ),
     );
-
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //    return Container(
 //      height: MediaQuery.of(context).size.height,
@@ -323,22 +292,6 @@ class BookItem extends StatelessWidget {
 //      ),
 //    ) ;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //    Column(
 //      children: <Widget>[
 //        Container(
@@ -409,11 +362,6 @@ class BookItem extends StatelessWidget {
 //        )
 //      ],
 //    )
-
-
-
-
-
 
 //
 //
@@ -595,8 +543,6 @@ class _booksState extends State<books> {
 
  */
 
-
-
 /*
 Card(
       elevation: 5,
@@ -622,7 +568,6 @@ Card(
       ),
     )
  */
-
 
 /*
 ClipRRect(
@@ -657,31 +602,6 @@ ClipRRect(
       ),
     )
  */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 ClipRRect(

@@ -1,17 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:flutter_screenutil/flutter_screenutil.dart' ;
-import '../widgets/addbookButton_widget.dart';
-import '../widgets/addPhoto_widget.dart';
 
+import '../widgets/add_book_button_widget.dart';
+import '../widgets/add_photo_widget.dart';
 
 ///todo
 ///// شوف هتعمل ايه فى كود submit
-
-
 
 ///  Variables To Adding Book ////
 const String _bookTitle = 'Book Title';
@@ -27,7 +26,7 @@ final Map<String, Object> _addBookData = {
   _bookTitle: '',
   _authorName: '',
   _noOfCopies: '',
-  _bookCategory:'',
+  _bookCategory: '',
   'About ': '',
 };
 
@@ -52,9 +51,38 @@ class _AddBookScreenState extends State<AddBookScreen> {
       _addBookData[_bookImage] = _image;
     });
   }
-  final List<String> kCategories = ['Science Fiction', 'satire', 'drama', 'Action and Adventure', 'Romance', 'mystery', 'horror', 'self help',
-    'guide', 'travel', "children's", 'religious', 'science', 'history', 'math', 'anthologies', 'poetry', 'encyclopedia','dictionaries',
-    'comics', 'art','cookbooks', 'diaries', 'prayer books', 'series', 'trilogies', 'biographies', 'autobiographies',  'fantasy'];
+
+  final List<String> kCategories = [
+    'Science Fiction',
+    'satire',
+    'drama',
+    'Action and Adventure',
+    'Romance',
+    'mystery',
+    'horror',
+    'self help',
+    'guide',
+    'travel',
+    "children's",
+    'religious',
+    'science',
+    'history',
+    'math',
+    'anthologies',
+    'poetry',
+    'encyclopedia',
+    'dictionaries',
+    'comics',
+    'art',
+    'cookbooks',
+    'diaries',
+    'prayer books',
+    'series',
+    'trilogies',
+    'biographies',
+    'autobiographies',
+    'fantasy'
+  ];
 
   Future getImageFromDevice() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -143,8 +171,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                                     //_image == null;
                                     // _image.delete(recursive: false) ;
                                     //_image.deleteSync(recursive: true) ;
-                                  }
-                              ),
+                                  }),
                             ],
                           ),
                         );
@@ -189,10 +216,9 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 height: ScreenUtil().setHeight(15),
               ),
 
-
-
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(32)),
+                padding:
+                    EdgeInsets.symmetric(horizontal: ScreenUtil().setWidth(32)),
                 child: Material(
                   elevation: 5.0,
                   borderRadius: BorderRadius.all(Radius.circular(30)),
@@ -214,12 +240,11 @@ class _AddBookScreenState extends State<AddBookScreen> {
                     },
                     value: _categoryValue,
                     decoration: kInputDecoration.copyWith(
-                        labelText:  "Categories",
+                        labelText: "Categories",
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal:ScreenUtil().setWidth(25) ,
+                          horizontal: ScreenUtil().setWidth(25),
                           vertical: ScreenUtil().setHeight(1),
-                        )
-                    ),
+                        )),
                     items: kCategories.map((val) {
                       return DropdownMenuItem(
                         child: Text(val),
@@ -232,7 +257,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
               SizedBox(
                 height: ScreenUtil().setHeight(15),
               ),
-
 
               //The ADD Button
               Buttons(
@@ -253,8 +277,8 @@ var kInputDecoration = InputDecoration(
   labelStyle: TextStyle(color: Colors.blueGrey),
   border: InputBorder.none,
   contentPadding: EdgeInsets.symmetric(
-    horizontal:ScreenUtil().setWidth(25) ,
-    vertical:  ScreenUtil().setHeight(15),
+    horizontal: ScreenUtil().setWidth(25),
+    vertical: ScreenUtil().setHeight(15),
   ),
 );
 
@@ -283,7 +307,7 @@ class InputText extends StatelessWidget {
           onSaved: (value) {
             _addBookData[inputTextName] = value;
           },
-          decoration: kInputDecoration.copyWith(labelText: inputTextName ),
+          decoration: kInputDecoration.copyWith(labelText: inputTextName),
         ),
       ),
     );

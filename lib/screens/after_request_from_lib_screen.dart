@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-class afterborrowScreen extends StatelessWidget {
+class AfterBorrowScreen extends StatelessWidget {
   static final String routeName = "/afterborrowscreen";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(onPressed: ()=>Navigator.of(context).pop(),
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).pop(),
           icon: Icon(
             Icons.arrow_back,
             size: 30,
