@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:graduation/providers/location_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import './map_screen.dart';
-import '../Providers/location_provider.dart';
 import '../widgets/add_photo_widget.dart';
 
 // ignore: camel_case_types
@@ -125,7 +125,7 @@ class _SignupLibState extends State<SignupLib> {
               isSelecting: true,
             )));
     if (_PickedLocation != null) {
-      locationbuttontxt = await Provider.of<locationinfo>(context,
+      locationbuttontxt = await Provider.of<LocationInfo>(context,
               listen: false)
           .getPlaceAddress(_PickedLocation.latitude, _PickedLocation.longitude);
       if (locationbuttontxt == null) {
@@ -152,6 +152,8 @@ class _SignupLibState extends State<SignupLib> {
       } else {
         locationtext = locationbuttontxt;
       }
+      _authData['latitude'] = _PickedLocation.latitude?.toString();
+      _authData['longitude'] = _PickedLocation.longitude?.toString();
     }
     isloading = false;
   }
@@ -478,8 +480,8 @@ class _SignupLibState extends State<SignupLib> {
                         SizedBox(
                           height: 15,
                         ),
-                        Consumer<locationinfo>(
-                          builder: (ctx, locationinfo, _) {
+                        Consumer<LocationInfo>(
+                          builder: (ctx, locationInfo, _) {
                             return isloading == true
                                 ? CircularProgressIndicator()
                                 : InkWell(

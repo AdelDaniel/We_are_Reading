@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AfterBorrowScreen extends StatelessWidget {
-  static final String routeName = "/afterborrowscreen";
+  static final String routeName = "/after-borrow";
 
   @override
   Widget build(BuildContext context) {

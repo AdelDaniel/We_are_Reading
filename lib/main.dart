@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:graduation/providers/auth.dart';
 import 'package:graduation/providers/global_data.dart';
+import 'package:graduation/providers/location_provider.dart';
+import 'package:graduation/screens/splashscreen.dart';
 import 'package:provider/provider.dart';
 
 import './Providers/book_provider.dart';
 import './Providers/library_provider.dart';
-import './Providers/location_provider.dart';
 import './Providers/user_provider.dart';
 import './screens/add_book_screen.dart';
 import './screens/after_request_from_lib_screen.dart';
 import './screens/login_screen.dart';
-import './screens/navigation_screen.dart';
+import './screens/main_screen.dart';
 import './screens/opening_screen.dart';
 import './screens/profile_screen.dart';
 import './screens/signup_borrower_screen.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
             previous?.cities ?? [],
           ),
         ),
-        ChangeNotifierProvider.value(value: locationinfo()),
+        ChangeNotifierProvider.value(value: LocationInfo()),
         ChangeNotifierProvider<LibraryProvider>(
           create: (context) => LibraryProvider(),
         ),
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'MyShop',
+        title: 'Naqraa',
         theme: ThemeData(
           primaryColor: Color.fromRGBO(251, 192, 45, 1),
           //accentColor: Colors.deepOrange,
@@ -56,15 +57,16 @@ class MyApp extends StatelessWidget {
                 ),
               ),
         ),
-        home: Opening(),
+        home: SplashScreen(),
         routes: {
           LoginScreen.routeName: (context) => LoginScreen(),
           SignupLib.routeName: (context) => SignupLib(),
+          Opening.routeName: (context) => Opening(),
           SignUpBorrower.routeName: (context) => SignUpBorrower(),
           ProfileScreen.routeName: (context) => ProfileScreen(),
-          AddBookScreen.routename: (context) => AddBookScreen(),
+          AddBookScreen.routeName: (context) => AddBookScreen(),
           AfterBorrowScreen.routeName: (context) => AfterBorrowScreen(),
-          FancyBottomBarPage.routeName: (context) => FancyBottomBarPage(),
+          MainScreen.routeName: (context) => MainScreen(),
         },
       ),
     );

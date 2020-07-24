@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
-  static final String routeName = "/profilescreen";
+  static final String routeName = "/profile";
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,9 @@ class ProfileScreen extends StatelessWidget {
             child: Center(
               child: Column(
                 children: <Widget>[
-                  SizedBox(height: 35,),
+                  SizedBox(
+                    height: 35,
+                  ),
                   Center(
                     child: Stack(
                       children: <Widget>[
@@ -92,7 +94,9 @@ class ProfileScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 7,),
+                  SizedBox(
+                    height: 7,
+                  ),
                   Text(
                     "Maktabt Misr",
                     style: TextStyle(color: Color(0xFF575A89), fontSize: 28),
@@ -100,103 +104,127 @@ class ProfileScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      SizedBox(height: 24,),
+                      SizedBox(
+                        height: 24,
+                      ),
                       Row(
                         children: <Widget>[
                           Container(
-                            width: MediaQuery.of(context).size.width*0.5,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             height: 56,
                             color: Color(0xFFFBC02D),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                Image.asset("assets/images/book3.png",),
-                                SizedBox(width: 10,),
-                                Text("Uploaded",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24
-                                ),)
+                                Image.asset(
+                                  "assets/images/book3.png",
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  "Uploaded",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 24),
+                                )
                               ],
                             ),
                           ),
                           Container(
-                            width: MediaQuery.of(context).size.width*0.5,
+                            width: MediaQuery.of(context).size.width * 0.5,
                             height: 56,
                             color: Colors.white,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                Image.asset("assets/images/heart.png",),
-                                SizedBox(width: 10,),
-
+                                Image.asset(
+                                  "assets/images/heart.png",
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
                                 Container(
                                   width: 120,
-                                  child: Text("50 Likes",
+                                  child: Text(
+                                    "50 Likes",
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
-                                        color: Color(0xFFFBC02D),
-                                        fontSize: 24
-                                    ),),
+                                        color: Color(0xFFFBC02D), fontSize: 24),
+                                  ),
                                 )
                               ],
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 8,),
-                      Padding(
-                        padding: const EdgeInsets.only(left:26.0),
-                        child: Text("Email",
-                        style: TextStyle(
-                          color: Color(0xFFFBC02D),
-                        ),),
+                      SizedBox(
+                        height: 8,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left:26.0),
-                        child: Text("ali@gmail.com",
-                          style: TextStyle(
-                            fontSize: 17,
-                            color: Color(0xFF575A89),
-                          ),),
-                      ),
-                      Divider(thickness: 1.5,),
-                      Padding(
-                        padding: const EdgeInsets.only(left:26.0),
-                        child: Text("phone",
+                        padding: const EdgeInsets.only(left: 26.0),
+                        child: Text(
+                          "Email",
                           style: TextStyle(
                             color: Color(0xFFFBC02D),
-                          ),),
+                          ),
+                        ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left:26.0),
-                        child: Text("55555555555555",
+                        padding: const EdgeInsets.only(left: 26.0),
+                        child: Text(
+                          "ali@gmail.com",
                           style: TextStyle(
                             fontSize: 17,
                             color: Color(0xFF575A89),
-                          ),),
+                          ),
+                        ),
                       ),
-                      Divider(thickness: 1.5,),
+                      Divider(
+                        thickness: 1.5,
+                      ),
                       Padding(
-                        padding: const EdgeInsets.only(left:26.0),
-                        child: Text("Governorate",
+                        padding: const EdgeInsets.only(left: 26.0),
+                        child: Text(
+                          "phone",
                           style: TextStyle(
                             color: Color(0xFFFBC02D),
-                          ),),
+                          ),
+                        ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left:26.0),
-                        child: Text("Sharkia",
+                        padding: const EdgeInsets.only(left: 26.0),
+                        child: Text(
+                          "55555555555555",
                           style: TextStyle(
                             fontSize: 17,
                             color: Color(0xFF575A89),
-                          ),),
+                          ),
+                        ),
+                      ),
+                      Divider(
+                        thickness: 1.5,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 26.0),
+                        child: Text(
+                          "Governorate",
+                          style: TextStyle(
+                            color: Color(0xFFFBC02D),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 26.0),
+                        child: Text(
+                          "Sharkia",
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: Color(0xFF575A89),
+                          ),
+                        ),
                       ),
                     ],
                   ),
-
-
-
                 ],
               ),
             ),

@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'dart:io';
 
-class locationinfo with ChangeNotifier {
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class LocationInfo with ChangeNotifier {
   Future<String> getPlaceAddress(double lat, double lng) async {
     try {
       final result = await InternetAddress.lookup('google.com');

@@ -33,7 +33,7 @@ final Map<String, Object> _addBookData = {
 ///*****************************************************///
 
 class AddBookScreen extends StatefulWidget {
-  static const routename = 'AddBookLibraryScreen';
+  static const routeName = '/add-book-library';
   @override
   _AddBookScreenState createState() => _AddBookScreenState();
 }
