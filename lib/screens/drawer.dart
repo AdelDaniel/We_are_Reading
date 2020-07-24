@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:graduation/mixins/alerts_mixin.dart';
+import 'package:graduation/models/http_exception.dart';
+import 'package:graduation/providers/auth.dart';
+import 'package:graduation/screens/login_screen.dart';
+import 'package:provider/provider.dart';
 
 class AppDrawer extends StatefulWidget {
   @override
   _AppDrawerState createState() => _AppDrawerState();
 }
 
-class _AppDrawerState extends State<AppDrawer> {
+class _AppDrawerState extends State<AppDrawer> with AlertsMixin {
+
   bool filter = false;
   List<bool> checkValGovernorate = [
     true,
@@ -81,8 +87,21 @@ class _AppDrawerState extends State<AppDrawer> {
     });
   }
 
+  Future<void> _logout() async {
+    try {
+      await Provider.of<Auth>(context, listen: false).logout();
+      showSuccessDialog(context, 'logged out successfully');
+    } on HttpException catch (e) {
+      showErrorDialog(context, e.toString());
+    } catch (e) {
+      throw e;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final Auth _authReference = Provider.of<Auth>(context);
+
     return filter == false
         ? Drawer(
             child: Container(
@@ -141,6 +160,23 @@ class _AppDrawerState extends State<AppDrawer> {
                     thickness: 1,
                   ),
                   ListTile(
+                    onTap: () async {
+                      if(_authReference.isAuth) {
+                        final xx = (await showConfirmDialog(
+                            context,
+                            null,
+                            'Log out',
+                            'Are you sure you want to logout?', [
+                          'Cancel',
+                          'Log out'
+                        ])) ??
+                            false;
+                        if (xx) _logout();
+                      }
+                      else
+                        Navigator.of(context)
+                            .pushNamed(LoginScreen.routeName);
+                    },
                     trailing: IconButton(
                         icon: Icon(
                           Icons.exit_to_app,
@@ -149,7 +185,7 @@ class _AppDrawerState extends State<AppDrawer> {
                         ),
                         onPressed: () {}),
                     title: Text(
-                      'Log Out',
+                      _authReference.isAuth ? 'Log Out' : 'Login',
                       style: TextStyle(
                         color: Color.fromRGBO(251, 192, 45, 1),
                         fontSize: 22,

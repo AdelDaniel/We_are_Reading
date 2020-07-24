@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 
-class signupBorrower extends StatefulWidget {
-  static final String routeName = "/signupBorrower";
+class SignUpBorrower extends StatefulWidget {
+  static final String routeName = "/signup-borrower";
 
   @override
-  _signupBorrowerState createState() => _signupBorrowerState();
+  _SignUpBorrowerState createState() => _SignUpBorrowerState();
 }
 
-class _signupBorrowerState extends State<signupBorrower> {
+class _SignUpBorrowerState extends State<SignUpBorrower> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   Map<String, Object> _authData = {
@@ -22,7 +22,7 @@ class _signupBorrowerState extends State<signupBorrower> {
     'governorate': '',
     'profilephoto': '',
   };
-  List<String> Governorates = ['Gharbia', 'Qna', 'Luxor', 'Dummy'];
+  List<String> governorates = ['Gharbia', 'Qna', 'Luxor', 'Dummy'];
   var _goverval;
   var photobuttontxt = 'Profile picture';
 
@@ -304,7 +304,7 @@ class _signupBorrowerState extends State<signupBorrower> {
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: 25, vertical: 1)),
-                              items: Governorates.map((val) {
+                              items: governorates.map((val) {
                                 return DropdownMenuItem(
                                   child: Text(val),
                                   value: val,

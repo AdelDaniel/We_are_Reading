@@ -1,9 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:graduation/mixins/alerts_mixin.dart';
+import 'package:graduation/mixins/validation_mixin.dart';
+import 'package:graduation/models/http_exception.dart';
+import 'package:graduation/providers/auth.dart';
+import 'package:provider/provider.dart';
 
 import './signup_borrower_screen.dart';
-import './signup_library_screen.dart';
+import 'main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   static final String routeName = "/login";
@@ -12,22 +20,81 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-
-  Map<String, String> _authData = {
-    'email': '',
+class _LoginScreenState extends State<LoginScreen>
+    with AlertsMixin, ValidationMixin {
+  final FocusNode _focusNode1 = FocusNode();
+  final FocusNode _focusNode2 = FocusNode();
+  var args;
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+  Map<String, dynamic> _authData = {
+    'username': '',
     'password': '',
   };
 
+  Auth _authReference;
+
+  bool _isLoading = false;
+
+  Future<void> _login() async {
+    if (_loginFormKey.currentState.validate()) {
+      _loginFormKey.currentState.save();
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        final regResponse = await _authReference.login(json.encode(_authData));
+//        if (Navigator.of(context).canPop()) {
+//          Navigator.of(context).pop();
+//        } else {
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil(MainScreen.routeName, (route) => false);
+//        }
+      } on HttpException catch (error) {
+        showErrorDialog(
+            context, error.toString(), Duration(milliseconds: 1500));
+      } catch (error) {
+        throw error;
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } else {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _focusNode1.dispose();
+    _focusNode2.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _authReference = Provider.of<Auth>(context, listen: false);
+    super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _focusNode1.addListener(() {
+      setState(() {});
+    });
+    _focusNode2.addListener(() {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final h = MediaQuery.of(context).size.height;
-    final w = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Form(
-        key: _formKey,
+        key: _loginFormKey,
         child: ListView(
           children: <Widget>[
             Stack(
@@ -96,23 +163,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     elevation: 2.0,
                     borderRadius: BorderRadius.all(Radius.circular(30)),
                     child: TextFormField(
-                      validator: (value) {
-                        if (value.isEmpty || !value.contains('@')) {
-                          return 'Invalid email!';
-                        }
-                        return null;
-                      },
+                      validator: validateUsername,
+                      focusNode: _focusNode1,
                       onSaved: (value) {
-                        _authData['email'] = value;
+                        _authData['username'] = value;
+                      },
+                      keyboardType: TextInputType.text,
+                      onFieldSubmitted: (val) {
+                        _focusNode1.unfocus();
+                        FocusScope.of(context).requestFocus(_focusNode2);
                       },
                       decoration: InputDecoration(
-                          labelText: "Email",
+                          labelText: "username",
                           labelStyle: TextStyle(color: Colors.blueGrey),
                           prefixIcon: Material(
                             elevation: 0,
                             borderRadius: BorderRadius.all(Radius.circular(30)),
                             child: Icon(
-                              Icons.email,
+                              Icons.person,
                               color: Theme.of(context).primaryColor,
                             ),
                           ),
@@ -138,6 +206,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                         return null;
                       },
+                      focusNode: _focusNode2,
+                      onFieldSubmitted: (val) {
+                        _focusNode2.unfocus();
+                        _login();
+                      },
                       onSaved: (value) {
                         _authData['password'] = value;
                       },
@@ -162,25 +235,35 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 20,
                 ),
                 Container(
-                  width: ScreenUtil().setWidth(355),
+//                  width: ScreenUtil().setWidth(355),
+                  width: double.infinity,
                   child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 32),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(100)),
-                            color: Theme.of(context).primaryColor),
-                        child: FlatButton(
-                          child: Text(
-                            "Login",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 18),
-                          ),
-                          onPressed: _submit,
-                        ),
-                      )),
+                      child: _isLoading
+                          ? SizedBox(
+                              height: 50.0,
+                              child: Center(
+                                child: Platform.isIOS
+                                    ? CupertinoActivityIndicator()
+                                    : CircularProgressIndicator(),
+                              ),
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(100)),
+                                  color: Theme.of(context).primaryColor),
+                              child: FlatButton(
+                                child: Text(
+                                  "Login",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 18),
+                                ),
+                                onPressed: _login,
+                              ),
+                            )),
                 ),
                 SizedBox(
                   height: 20,
@@ -208,10 +291,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     buildButtonTheme(context, 'Borrower',
-                                        _gotosignupBorrower),
+                                        () => _goToSignUp()),
                                     Text('or'),
-                                    buildButtonTheme(
-                                        context, 'Library', _gotosignupLib),
+                                    buildButtonTheme(context, 'Library',
+                                        () => _goToSignUp(true)),
                                   ],
                                 ),
                               );
@@ -236,14 +319,14 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget buildButtonTheme(BuildContext context, String txt, Function ToDo) {
+  Widget buildButtonTheme(BuildContext context, String txt, Function toDo) {
     return Container(
       margin: EdgeInsets.all(5),
       child: ButtonTheme(
         minWidth: ScreenUtil().setWidth(220),
         height: ScreenUtil().setHeight(38),
         child: FlatButton(
-          onPressed: ToDo,
+          onPressed: toDo,
           child: Text(
             txt,
             style: TextStyle(
@@ -259,19 +342,14 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _submit() {
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
-      print(_authData['email']);
-    }
-  }
-
-  _gotosignupLib() {
-    Navigator.of(context).pushNamed(SignupLib.routeName);
-  }
-
-  _gotosignupBorrower() {
-    Navigator.of(context).pushNamed(SignUpBorrower.routeName);
+  Future<void> _goToSignUp([bool isLibrary = false]) async {
+    Navigator.of(context).pop();
+    final xx = (await Navigator.of(context).pushNamed(SignUpBorrower.routeName,
+            arguments: {'roleId': isLibrary ? 2 : 1})) ??
+        false;
+    if (xx)
+      showSuccessBottomSheet(context, 'Registered successfully',
+          'You have registered successfully, you can login now.');
   }
 }
 

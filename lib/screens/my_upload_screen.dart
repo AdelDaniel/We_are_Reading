@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/my_upload_widget.dart';
 import './add_book_screen.dart';
+import '../widgets/my_upload_widget.dart';
 
 class MyUploadScreen extends StatelessWidget {
   @override
@@ -30,7 +30,7 @@ class MyUploadScreen extends StatelessWidget {
               size: 30,
             ),
             onPressed: () =>
-                Navigator.of(context).pushNamed(AddBookScreen.routename)),
+                Navigator.of(context).pushNamed(AddBookScreen.routeName)),
       ),
     );
   }

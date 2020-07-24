@@ -1,15 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:graduation/mixin/alerts_mixin.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:graduation/mixins/alerts_mixin.dart';
 import 'package:graduation/models/city.dart';
+import 'package:graduation/models/http_exception.dart';
 import 'package:graduation/providers/auth.dart';
 import 'package:graduation/providers/global_data.dart';
+import 'package:graduation/providers/location_provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/add_photo_widget.dart';
+import 'map_screen.dart';
 
 class SignUpBorrower extends StatefulWidget {
   static final String routeName = "/sign-up-borrower";
@@ -22,35 +28,216 @@ class _SignUpBorrowerState extends State<SignUpBorrower> with AlertsMixin {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   Map<String, dynamic> _authData = {
-    'fullname' : '',
+    'fullname': '',
     'username': '',
     'email': '',
+    'longitude': '',
+    'latitude': '',
     'phoneNumber': '',
     'password': '',
-    'confirmPassword' : '',
-    'roleId' : 1
+    'confirmPassword': '',
+    'roleId': 1
   };
-  var _goverval;
-  File _pickedimage;
+  var _governVal;
 
-  Future<void> _takephoto() async {
-    _pickedimage = await ImagePicker.pickImage(
-      source: ImageSource.gallery,
-      maxHeight: 600,
-      maxWidth: 600,
-    );
-    if (_pickedimage != null) {
-      setState(() {
-        _authData['profilephoto'] = _pickedimage;
-      });
+  ImagePicker _imagePicker = ImagePicker();
+  bool isLoading = false;
+  var locationButtonTxt = 'Location';
+  PermissionStatus _permissionGranted;
+  LatLng _pickedLocation;
+  var currentLocData;
+  Location location = new Location();
+  String locationText = '';
+  bool _serviceEnabled;
+
+  File _pickedImage;
+  Future<void> selectLocationOnMap(BuildContext context) async {
+    isLoading = true;
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        setState(() {
+          isLoading = false;
+        });
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error !'),
+                content: Text('Location is disabled , try again later'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Ok'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            });
+        return;
+      }
     }
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.DENIED) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.GRANTED) {
+        setState(() {
+          isLoading = false;
+        });
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error !'),
+                content: Text('Permission denied, try again later'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Ok'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              );
+            });
+        return;
+      }
+    }
+
+    currentLocData = await Location().getLocation();
+
+    _pickedLocation = await Navigator.of(context).push(MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) => MapScreen(
+              initialLocationLat: currentLocData.latitude,
+              initialLocationLng: currentLocData.longitude,
+              isSelecting: true,
+            )));
+    if (_pickedLocation != null) {
+      locationButtonTxt = await Provider.of<LocationInfo>(context,
+              listen: false)
+          .getPlaceAddress(_pickedLocation.latitude, _pickedLocation.longitude);
+      if (locationButtonTxt == null) {
+        setState(() {
+          locationButtonTxt = 'Location';
+          isLoading = false;
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Error !'),
+                  content: Text('No internet connection , try again later'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('Ok'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
+                );
+              });
+        });
+      } else {
+        locationText = locationButtonTxt;
+      }
+      _authData['latitude'] = _pickedLocation.latitude?.toString();
+      _authData['longitude'] = _pickedLocation.longitude?.toString();
+    }
+    isLoading = false;
   }
+
+  bool isUploading = false;
+
+  Future<PickedFile> _getImageFromCamera() async {
+    PickedFile image = await _imagePicker.getImage(
+        source: ImageSource.camera, maxWidth: 600, imageQuality: 90);
+    return image;
+  }
+
+  Future<void> _uploadImage(String filePath) async {
+    setState(() {
+      isUploading = true;
+    });
+    try {
+      final response = await _authReference.uploadFile(filePath);
+      _authData['profilePictureId'] = json.decode(response)['imageId'];
+    } on HttpException catch (e) {
+      print(e);
+    } catch (e) {
+      rethrow;
+    }
+    setState(() {
+      isUploading = false;
+    });
+  }
+
+  Future<PickedFile> _getImageFromGallery() async {
+    PickedFile image = await _imagePicker.getImage(
+        source: ImageSource.gallery, maxWidth: 600, imageQuality: 90);
+    return image;
+  }
+
+  _openPickingOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: EdgeInsets.all(25.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            IconButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                PickedFile myFile = await _getImageFromCamera();
+                _pickedImage = File(myFile.path);
+                _uploadImage(myFile.path);
+                setState(() {});
+              },
+              icon: Icon(
+                Icons.camera_alt,
+                color: Theme.of(context).buttonColor,
+              ),
+              iconSize: 28.0,
+              tooltip: 'Camera',
+            ),
+            IconButton(
+              onPressed: () async {
+                Navigator.pop(context);
+                PickedFile myFile = await _getImageFromGallery();
+                _pickedImage = File(myFile.path);
+                _uploadImage(myFile.path);
+                setState(() {});
+              },
+              icon: Icon(
+                Icons.photo_library,
+                color: Theme.of(context).buttonColor,
+              ),
+              iconSize: 28.0,
+              tooltip: 'Gallery',
+            )
+          ],
+        ),
+      ),
+      elevation: 0,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+            topRight: Radius.circular(26.0), topLeft: Radius.circular(26.0)),
+      ),
+    );
+  }
+
   bool _isLoading = false;
+
+  Map args;
 
   Future<void> _register() async {
     if (_formKey.currentState.validate()) {
-      if(false) {
-
+      if (false) {
       }
 //      if (_pickedimage == null) {
 //        showDialog(
@@ -76,37 +263,40 @@ class _SignUpBorrowerState extends State<SignUpBorrower> with AlertsMixin {
           _isLoading = true;
         });
         try {
-
-              await Provider.of<Auth>(context, listen: false).register(_authData);
+          await _authReference.register(_authData);
+          Navigator.of(context).pop(true);
 //          final parsedRegResponse = json.decode(regResponse);
 //          print(parsedRegResponse);
 //          Navigator.of(context).pushNamedAndRemoveUntil(
 //              MainScreen.routeName, (route) => false);
-          _isLoading = false;
         } on HttpException catch (error) {
-          _isLoading = false;
           showErrorDialog(
               context, error.toString(), Duration(milliseconds: 1500));
         } catch (error) {
-          _isLoading = false;
           throw error;
         }
+        _isLoading = false;
         setState(() {});
       }
     }
   }
 
   GlobalData _globalDataReference;
+  Auth _authReference;
 
   @override
   void didChangeDependencies() {
     _globalDataReference = Provider.of<GlobalData>(context, listen: false);
+    args = ModalRoute.of(context).settings.arguments ?? {};
+    _authData['roleId'] = args['roleId'];
+    _authReference = Provider.of<Auth>(context, listen: false);
     if (_globalDataReference.cities == null ||
         _globalDataReference.cities.length == 0) {
       _getCities();
     }
     super.didChangeDependencies();
   }
+
   Future<void> _getCities() async {
     try {
       await _globalDataReference.fetchCities();
@@ -180,9 +370,32 @@ class _SignUpBorrowerState extends State<SignUpBorrower> with AlertsMixin {
                           ],
                         ),
                         InkWell(
-                            onTap: _takephoto,
-                            child: AddPhotoAvatar(
-                              image: _pickedimage,
+                            borderRadius: BorderRadius.circular(75.0),
+                            onTap: _openPickingOptions,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: <Widget>[
+                                AddPhotoAvatar(
+                                  image: _pickedImage,
+                                ),
+                                if (isUploading)
+                                  Container(
+                                    width: 150.0,
+                                    height: 150.0,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(75.0),
+                                        color: Colors.black45.withOpacity(0.5)),
+                                    child: SizedBox(
+                                      width: 30.0,
+                                      height: 30.0,
+                                      child: Platform.isIOS
+                                          ? CupertinoActivityIndicator()
+                                          : CircularProgressIndicator(),
+                                    ),
+                                  )
+                              ],
                             )),
                         SizedBox(height: 10),
                         Padding(
@@ -202,7 +415,7 @@ class _SignUpBorrowerState extends State<SignUpBorrower> with AlertsMixin {
                                 _authData['fullname'] = value;
                               },
                               decoration: InputDecoration(
-                                  labelText: "User Name",
+                                  labelText: "Username",
                                   labelStyle: TextStyle(color: Colors.blueGrey),
                                   prefixIcon: Material(
                                     elevation: 0,
@@ -358,7 +571,8 @@ class _SignUpBorrowerState extends State<SignUpBorrower> with AlertsMixin {
                             borderRadius: BorderRadius.all(Radius.circular(30)),
                             child: Selector<GlobalData, List<City>>(
                               selector: (_, globalData) => globalData.cities,
-                              builder: (_, cities, __) =>  DropdownButtonFormField(
+                              builder: (_, cities, __) =>
+                                  DropdownButtonFormField(
                                 validator: (val) {
                                   if (val == null) {
                                     return 'Choose Your Governorate';
@@ -370,14 +584,15 @@ class _SignUpBorrowerState extends State<SignUpBorrower> with AlertsMixin {
                                 },
                                 onChanged: (val) {
                                   setState(() {
-                                    _goverval = val;
-                                    print(_goverval);
+                                    _governVal = val;
+                                    print(_governVal);
                                   });
                                 },
-                                value: _goverval,
+                                value: _governVal,
                                 decoration: InputDecoration(
                                     labelText: "Governorate",
-                                    labelStyle: TextStyle(color: Colors.blueGrey),
+                                    labelStyle:
+                                        TextStyle(color: Colors.blueGrey),
                                     prefixIcon: Material(
                                       elevation: 0,
                                       borderRadius:
@@ -399,6 +614,54 @@ class _SignUpBorrowerState extends State<SignUpBorrower> with AlertsMixin {
                         SizedBox(
                           height: 15,
                         ),
+                        if (args['roleId'] == 2)
+                          Consumer<LocationInfo>(
+                            builder: (ctx, locationInfo, _) {
+                              return isLoading == true
+                                  ? CircularProgressIndicator()
+                                  : InkWell(
+                                      onTap: () {
+                                        selectLocationOnMap(context);
+                                        setState(() {});
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 32),
+                                        child: Material(
+                                          elevation: 2.0,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(30)),
+                                          child: TextFormField(
+                                            enabled: false,
+                                            onSaved: (value) {
+                                              if (_pickedLocation != null) {
+                                                _authData['latitude'] =
+                                                    _pickedLocation.latitude;
+                                                _authData['longitude'] =
+                                                    _pickedLocation.longitude;
+                                              }
+                                            },
+                                            decoration: InputDecoration(
+                                                labelText: locationButtonTxt,
+                                                labelStyle: TextStyle(
+                                                    color: Colors.blueGrey),
+                                                prefixIcon: Material(
+                                                  elevation: 0,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(30)),
+                                                ),
+                                                border: InputBorder.none,
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        horizontal: 25,
+                                                        vertical: 10)),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                            },
+                          ),
                         SizedBox(
                           height: 15,
                         ),
@@ -409,22 +672,32 @@ class _SignUpBorrowerState extends State<SignUpBorrower> with AlertsMixin {
               )),
               Padding(
                   padding: EdgeInsets.symmetric(horizontal: 32),
-                  child: Container(
-                    margin: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(100)),
-                        color: Color(0xfffac02e)),
-                    child: FlatButton(
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 18),
-                      ),
-                      onPressed: _register,
-                    ),
-                  )),
+                  child: _isLoading
+                      ? SizedBox(
+                          height: 50.0,
+                          child: Center(
+                            child: Platform.isIOS
+                                ? CupertinoActivityIndicator()
+                                : CircularProgressIndicator(),
+                          ),
+                        )
+                      : Container(
+                          margin: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(100)),
+                              color: Color(0xfffac02e)),
+                          child: FlatButton(
+                            child: Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18),
+                            ),
+                            onPressed: _register,
+                          ),
+                        )),
             ],
           )),
     );

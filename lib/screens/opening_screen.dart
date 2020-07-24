@@ -3,18 +3,19 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:graduation/mixins/alerts_mixin.dart';
 
 import './login_screen.dart';
-import './navigation_screen.dart';
+import './main_screen.dart';
 import './signup_borrower_screen.dart';
-import './signup_library_screen.dart';
 
 class Opening extends StatefulWidget {
+  static const routeName = '/opening';
   @override
   _OpeningState createState() => _OpeningState();
 }
 
-class _OpeningState extends State<Opening> {
+class _OpeningState extends State<Opening> with AlertsMixin {
   List<String> imgs = [
     'assets/images/1.png',
     'assets/images/2.png',
@@ -38,12 +39,14 @@ class _OpeningState extends State<Opening> {
     Navigator.of(context).pushNamed(LoginScreen.routeName);
   }
 
-  void _gotosignupLib() {
-    Navigator.of(context).pushNamed(SignupLib.routeName);
-  }
-
-  void _gotosignupBorrower() {
-    Navigator.of(context).pushNamed(SignUpBorrower.routeName);
+  Future<void> _goToSignUp([bool isLibrary = false]) async {
+    Navigator.of(context).pop();
+    final xx = (await Navigator.of(context).pushNamed(SignUpBorrower.routeName,
+            arguments: {'roleId': isLibrary ? 2 : 1})) ??
+        false;
+    if (xx)
+      showSuccessBottomSheet(context, 'Registered successfully',
+          'You have registered successfully, you can login now.');
   }
 
   @override
@@ -73,12 +76,11 @@ class _OpeningState extends State<Opening> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Container(
-                            child: Text(
-                              'Logo',
-                              style:
-                                  TextStyle(fontSize: ScreenUtil().setSp(28)),
-                            ),
-                            height: ScreenUtil().setHeight(50),
+                            child: Hero(
+                                tag: 'splash-logo',
+                                child: Image.asset(
+                                    'assets/images/logo_with_word.png')),
+                            height: ScreenUtil().setHeight(100),
                             margin: EdgeInsets.fromLTRB(
                                 0, ScreenUtil().setHeight(32), 0, 0)),
                         CarouselSlider.builder(
@@ -126,10 +128,10 @@ class _OpeningState extends State<Opening> {
                                             buildButtonTheme(
                                                 context,
                                                 'Borrower',
-                                                _gotosignupBorrower),
+                                                () => _goToSignUp()),
                                             Text('or'),
                                             buildButtonTheme(context, 'Library',
-                                                _gotosignupLib),
+                                                () => _goToSignUp(true)),
                                           ],
                                         ),
                                       );
@@ -150,7 +152,7 @@ class _OpeningState extends State<Opening> {
               ),
             ),
             Container(
-              height: ScreenUtil().setHeight(20),
+//              height: ScreenUtil().setHeight(20),
               alignment: Alignment.centerRight,
               margin: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               child: InkWell(
@@ -162,7 +164,8 @@ class _OpeningState extends State<Opening> {
                   ),
                 ),
                 onTap: () {
-                  Navigator.of(context).pushNamed(FancyBottomBarPage.routeName);
+                  Navigator.of(context)
+                      .pushReplacementNamed(MainScreen.routeName);
                 },
               ),
             ),
@@ -212,14 +215,14 @@ class _OpeningState extends State<Opening> {
     );
   }
 
-  Widget buildButtonTheme(BuildContext context, String txt, Function ToDo) {
+  Widget buildButtonTheme(BuildContext context, String txt, Function toDo) {
     return Container(
       margin: EdgeInsets.all(5),
       child: ButtonTheme(
         minWidth: ScreenUtil().setWidth(220),
         height: ScreenUtil().setHeight(38),
         child: FlatButton(
-          onPressed: ToDo,
+          onPressed: toDo,
           child: Text(
             txt,
             style: TextStyle(

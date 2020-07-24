@@ -107,6 +107,13 @@
             </list>
           </value>
         </entry>
+        <entry key="flutter_launcher_icons">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_launcher_icons-0.7.5/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="flutter_plugin_android_lifecycle">
           <value>
             <list>
@@ -408,6 +415,13 @@
             </list>
           </value>
         </entry>
+        <entry key="yaml">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/yaml-2.2.1/lib" />
+            </list>
+          </value>
+        </entry>
       </option>
     </properties>
     <CLASSES>
@@ -425,6 +439,7 @@
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/device_simulator-0.9.6/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/dots_indicator-1.2.0/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/file-5.2.1/lib" />
+      <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_launcher_icons-0.7.5/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_plugin_android_lifecycle-1.0.8/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_screenutil-1.1.0/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/google_maps_flutter-0.5.28+1/lib" />
@@ -465,6 +480,7 @@
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/vector_math-2.0.8/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/xdg_directories-0.1.0/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/xml-3.6.1/lib" />
+      <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/.pub-cache/hosted/pub.dartlang.org/yaml-2.2.1/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/bin/cache/pkg/sky_engine/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/packages/flutter/lib" />
       <root url="file://$PROJECT_DIR$/../../../../new sdk/flutter_windows_v1.5.4-hotfix.2-stable/flutter/packages/flutter_test/lib" />
