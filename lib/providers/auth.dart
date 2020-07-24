@@ -122,10 +122,11 @@ class Auth with ChangeNotifier {
     prefs.setString('token', json.encode(myToken));
   }
 
-  Future<String> uploadFile(String filePath) async {
+  Future<String> uploadFile(String filePath, [bool isBookCover = false]) async {
     try {
+      String type = isBookCover ? 'UploadUserImage' : 'UploadBookCoverImage';
       // string to uri
-      var url = Uri.parse("$uri/api/Account/UploadUserImage");
+      var url = Uri.parse("$uri/api/Account/$type");
 
       // create multipart request
       var request = new http.MultipartRequest("POST", url);
@@ -140,6 +141,7 @@ class Auth with ChangeNotifier {
         var multipartFile = new http.MultipartFile('Photo', stream, length,
             filename: basename(myFile.path));
         request.files.add(multipartFile);
+        if(isBookCover) request.headers.addAll({'Authorization': 'Bearer ${token.accessToken}'});
       }
       var response = await request.send();
       final respStr = await response.stream.bytesToString();

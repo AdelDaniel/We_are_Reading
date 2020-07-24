@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:graduation/providers/auth.dart';
+import 'package:graduation/providers/books.dart';
 import 'package:graduation/providers/global_data.dart';
 import 'package:graduation/providers/location_provider.dart';
 import 'package:graduation/screens/splashscreen.dart';
@@ -31,6 +32,15 @@ class MyApp extends StatelessWidget {
           update: (_, auth, previous) => GlobalData(
             auth.user,
             previous?.cities ?? [],
+          ),
+        ),
+        ChangeNotifierProxyProvider<Auth, Books>(
+          update: (_, auth, previous) => Books(
+              auth.user,
+              auth.token,
+              previous == null ? [] : previous.books,
+              previous == null ? [] : previous.uploads,
+
           ),
         ),
         ChangeNotifierProvider.value(value: LocationInfo()),

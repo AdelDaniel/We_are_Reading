@@ -100,7 +100,7 @@ class _AppDrawerState extends State<AppDrawer> with AlertsMixin {
 
   @override
   Widget build(BuildContext context) {
-    final Auth _authReference = Provider.of<Auth>(context);
+    final Auth _authReference = Provider.of<Auth>(context, listen: false);
 
     return filter == false
         ? Drawer(

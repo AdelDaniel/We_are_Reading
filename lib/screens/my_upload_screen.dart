@@ -1,22 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:graduation/mixins/alerts_mixin.dart';
+import 'package:graduation/models/http_exception.dart';
+import 'package:graduation/providers/books.dart';
+import 'package:graduation/widgets/shimmers/book_item_shimmer.dart';
+import 'package:provider/provider.dart';
 
 import './add_book_screen.dart';
 import '../widgets/my_upload_widget.dart';
 
-class MyUploadScreen extends StatelessWidget {
+class MyUploadScreen extends StatefulWidget {
+  @override
+  _MyUploadScreenState createState() => _MyUploadScreenState();
+}
+
+class _MyUploadScreenState extends State<MyUploadScreen> with AlertsMixin{
+  Books _booksReference;
+  bool _isLoading = false;
+
+  Future<void> _fetchUploads() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final xx = await _booksReference.fetchUploads();
+      print(_booksReference.uploads.length);
+    } on HttpException catch (error) {
+      if (error.statusCode == 401) {
+//        _authReference.logoutDone();
+      } else {
+        showErrorDialog(context, error.toString());
+      }
+    } catch (error) {
+      throw error;
+    }
+    finally {
+      if (this.mounted)
+        setState(() {
+          _isLoading = false;
+        });
+    }
+  }
+
+  @override
+  void initState() {
+    _booksReference = Provider.of<Books>(context, listen: false);
+    super.initState();
+  }
+
+  bool _firstCalled = false;
+  @override
+  void didChangeDependencies() {
+    if (!_firstCalled) {
+        _fetchUploads();
+      _firstCalled = true;
+    }
+    super.didChangeDependencies();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GridView.builder(
-        padding: EdgeInsets.all(10),
-        itemCount: 6,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: .65,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 5,
+      body: Consumer<Books>(
+          builder: (_, books, __) =>
+         GridView.builder(
+          padding: EdgeInsets.all(10),
+          itemCount: books.uploads.length == 0 && _isLoading ? 6 : books.uploads.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: .65,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 5,
+          ),
+          itemBuilder: (ctx, i) => books.uploads.length == 0 && _isLoading ? BookItemShimmer() : MyUploadWidget(
+            id: books.uploads[i].id,
+            title: books.uploads[i].title,
+            author: books.uploads[i].author,
+            copiesCount: books.uploads[i].copiesCount,
+            coverPhotoId: books.uploads[i].coverPhotoId,
+          ),
         ),
-        itemBuilder: (ctx, i) => MyUploadWidget(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(

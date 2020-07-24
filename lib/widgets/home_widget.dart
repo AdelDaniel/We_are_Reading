@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,19 +6,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../screens/after_request_from_lib_screen.dart';
 
 class BookItem extends StatelessWidget {
-//  final String id;
-//  final String bookName;
-//  final String autherName;
-//  final String bookImage;
-//  final int copies;
-//
-//  BookItem(
-//      this.id,
-//      this.bookName,
-//      this.autherName,
-//      this.bookImage,
-//      this.copies,
-//      );
+  final int id;
+  final String title;
+  final String author;
+  final int copiesCount;
+  final String coverPhotoId;
+
+  BookItem({
+    this.id,
+    this.title,
+    this.author,
+    this.copiesCount,
+    this.coverPhotoId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +49,11 @@ class BookItem extends StatelessWidget {
                     //image container
                     Container(
                         width: double.infinity,
-                        child: Image.network(
-                          'https://upload.wikimedia.org/wikipedia/ar/9/92/%D8%A7%D9%84%D8%B7%D9%86%D8%B7%D9%88%D8%B1%D9%8A%D8%A9.jpg',
+                        child: coverPhotoId != null && coverPhotoId != '' ? CachedNetworkImage(
+                          imageUrl: 'https://wearereading20200721193701.azurewebsites.net/Images/BookCovers/$coverPhotoId',
                           fit: BoxFit.fill,
                           height: double.infinity,
-                        )),
+                        ) : Container(color: Color.fromRGBO(251, 192, 45, 1)  ,)),
 
                     Positioned(
                       width: ScreenUtil().setWidth(183),
@@ -71,21 +72,21 @@ class BookItem extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  'الطنطورية',
+                                  '$title',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
                                           allowFontScalingSelf: true)),
                                 ),
                                 Text(
-                                  'رضوى عاشور',
+                                  '$author',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
                                           allowFontScalingSelf: true)),
                                 ),
                                 Text(
-                                  'عدد النسخ : 5',
+                                  'عدد النسخ : $copiesCount',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,

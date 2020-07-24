@@ -1,7 +1,21 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MyUploadWidget extends StatelessWidget {
+  final int id;
+  final String title;
+  final String author;
+  final int copiesCount;
+  final String coverPhotoId;
+
+  MyUploadWidget({
+    this.id,
+    this.title,
+    this.author,
+    this.copiesCount,
+    this.coverPhotoId,
+  });
   @override
   Widget build(BuildContext context) {
     double defaultScreenWidth = 400.0;
@@ -32,11 +46,12 @@ class MyUploadWidget extends StatelessWidget {
                     //image container
                     Container(
                         width: double.infinity,
-                        child: Image.network(
-                          'https://upload.wikimedia.org/wikipedia/ar/9/92/%D8%A7%D9%84%D8%B7%D9%86%D8%B7%D9%88%D8%B1%D9%8A%D8%A9.jpg',
+                        child: coverPhotoId != null && coverPhotoId != '' ? CachedNetworkImage(
+                          imageUrl: 'https://wearereading20200721193701.azurewebsites.net/Images/BookCovers/$coverPhotoId',
                           fit: BoxFit.fill,
                           height: double.infinity,
-                        )),
+                        ) : Container(color: Color.fromRGBO(251, 192, 45, 1)  ,)
+                    ),
 
                     Positioned(
                       width: ScreenUtil().setWidth(183),
@@ -58,7 +73,7 @@ class MyUploadWidget extends StatelessWidget {
                               CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  'الطنطورية',
+                                  '$title',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
@@ -66,7 +81,7 @@ class MyUploadWidget extends StatelessWidget {
                                           true)),
                                 ),
                                 Text(
-                                  'رضوى عاشور',
+                                  '$author',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
@@ -74,7 +89,7 @@ class MyUploadWidget extends StatelessWidget {
                                           true)),
                                 ),
                                 Text(
-                                  'عدد النسخ : 5',
+                                  'عدد النسخ : $copiesCount',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
@@ -119,7 +134,9 @@ class MyUploadWidget extends StatelessWidget {
                 ),
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      print(coverPhotoId);
+                    },
                     child: Text(
                       'update',
                       style: TextStyle(
