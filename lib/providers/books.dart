@@ -15,6 +15,7 @@ class Books with ChangeNotifier {
   List<Book> get books => _books;
   List<Book> _uploads = [];
   List<Book> get uploads => _uploads;
+  bool get isAuth => token != null;
 
   final User user;
   final Token token;
@@ -22,12 +23,17 @@ class Books with ChangeNotifier {
 
   Future<void> fetchBooks() async {
     try {
-      final response = await http.get('$uri/api/Book/GetAll');
+      var response;
+      if(isAuth)
+       response = await http.get('$uri/api/Book/GetAllForOthers',headers: {'Authorization': 'Bearer ${token.accessToken}'});
+      else
+        response = await http.get('$uri/api/Book/GetAll');
       final parsedResponse = json.decode(response.body);
       if (response.statusCode != 200) {
         throw HttpException(response.body, response.statusCode);
       }
-      parsedResponse.forEach((item) {
+      _books.clear();
+        parsedResponse.forEach((item) {
         _books.add(Book.fromJsonMap(item));
       });
 
@@ -54,12 +60,49 @@ class Books with ChangeNotifier {
     }
   }
 
-  Future<void> uploadBook(String encodedLoginData) async {
-  print(json.decode(encodedLoginData));
-    print(encodedLoginData);
+  Future<void> uploadBook(String encodedUploadData) async {
+  print(json.decode(encodedUploadData));
+    print(encodedUploadData);
     try {
       final response = await http.post('$uri/api/book/insert',
-          body: encodedLoginData,
+          body: encodedUploadData,
+          headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${token.accessToken}'});
+      if (response.statusCode != 200) {
+        throw HttpException(response.body, response.statusCode);
+      }
+      final parsedResponse = json.decode(response.body);
+      _uploads.add(Book.fromJsonMap(parsedResponse));
+      notifyListeners();
+
+    } catch (exp) {
+      throw exp;
+    }
+  }
+
+  Future<void> deleteBook(int id) async {
+    try {
+      final response = await http.delete('$uri/api/book/delete?bookId=$id',
+          headers: {'Authorization': 'Bearer ${token.accessToken}'});
+      if (response.statusCode != 200) {
+        throw HttpException(response.body, response.statusCode);
+      }
+      _uploads.removeWhere((element) => element.id == id);
+      notifyListeners();
+    } catch (exp) {
+      throw exp;
+    }
+  }
+
+  Future<void> updateBook(Map<String, dynamic> updateData) async {
+    final id = updateData['id'];
+    print(id);
+    updateData.remove('isUpdate');
+    updateData.remove('id');
+    print(updateData);
+    print(json.encode(updateData));
+    try {
+      final response = await http.put('$uri/api/book/Update?bookId=$id',
+          body: json.encode(updateData),
           headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${token.accessToken}'});
       if (response.statusCode != 200) {
         throw HttpException(response.body, response.statusCode);

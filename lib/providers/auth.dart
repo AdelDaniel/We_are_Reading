@@ -55,6 +55,7 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
       await setToken(responseData);
       await _getUserDetailsWithToken();
+      notifyListeners();
       return true;
     } catch (exp) {
       throw exp;
@@ -124,9 +125,9 @@ class Auth with ChangeNotifier {
 
   Future<String> uploadFile(String filePath, [bool isBookCover = false]) async {
     try {
-      String type = isBookCover ? 'UploadUserImage' : 'UploadBookCoverImage';
+      String type = isBookCover ?  'Book/UploadBookCoverImage' :'Account/UploadUserImage';
       // string to uri
-      var url = Uri.parse("$uri/api/Account/$type");
+      var url = Uri.parse("$uri/api/$type");
 
       // create multipart request
       var request = new http.MultipartRequest("POST", url);
@@ -149,7 +150,6 @@ class Auth with ChangeNotifier {
         throw HttpException(
             json.decode(respStr)['message'], response.statusCode);
       }
-      notifyListeners();
       return respStr;
     } catch (error) {
       throw error;

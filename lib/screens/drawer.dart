@@ -97,10 +97,16 @@ class _AppDrawerState extends State<AppDrawer> with AlertsMixin {
       throw e;
     }
   }
+  Auth _authReference ;
+
+  @override
+  void didChangeDependencies() {
+    _authReference = Provider.of<Auth>(context);
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final Auth _authReference = Provider.of<Auth>(context, listen: false);
 
     return filter == false
         ? Drawer(
@@ -175,7 +181,7 @@ class _AppDrawerState extends State<AppDrawer> with AlertsMixin {
                       }
                       else
                         Navigator.of(context)
-                            .pushNamed(LoginScreen.routeName);
+                            .pushNamedAndRemoveUntil(LoginScreen.routeName, (route) => false);
                     },
                     trailing: IconButton(
                         icon: Icon(

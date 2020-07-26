@@ -1,13 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:graduation/mixins/alerts_mixin.dart';
+import 'package:graduation/models/http_exception.dart';
+import 'package:graduation/providers/books.dart';
+import 'package:graduation/screens/add_book_screen.dart';
+import 'package:provider/provider.dart';
 
-class MyUploadWidget extends StatelessWidget {
+class MyUploadWidget extends StatefulWidget {
   final int id;
   final String title;
   final String author;
   final int copiesCount;
   final String coverPhotoId;
+  final String description;
 
   MyUploadWidget({
     this.id,
@@ -15,7 +21,43 @@ class MyUploadWidget extends StatelessWidget {
     this.author,
     this.copiesCount,
     this.coverPhotoId,
+    this.description
   });
+
+  @override
+  _MyUploadWidgetState createState() => _MyUploadWidgetState();
+}
+
+class _MyUploadWidgetState extends State<MyUploadWidget> with AlertsMixin {
+
+  Books _booksReference;
+  bool _isLoading = false;
+
+  Future<void> _deleteBook() async {
+        setState(() {
+          _isLoading = true;
+        });
+        try {
+          await _booksReference.deleteBook(widget.id);
+        } on HttpException catch (error) {
+          showErrorDialog(
+              context, error.toString(), Duration(milliseconds: 1500));
+        } catch (error) {
+          throw error;
+        }
+        finally {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+
+
+  @override
+  void didChangeDependencies() {
+    _booksReference = Provider.of<Books>(context);
+    super.didChangeDependencies();
+  }
   @override
   Widget build(BuildContext context) {
     double defaultScreenWidth = 400.0;
@@ -28,7 +70,7 @@ class MyUploadWidget extends StatelessWidget {
       height: defaultScreenHeight,
     );
 
-    return   Container(
+    return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -46,8 +88,8 @@ class MyUploadWidget extends StatelessWidget {
                     //image container
                     Container(
                         width: double.infinity,
-                        child: coverPhotoId != null && coverPhotoId != '' ? CachedNetworkImage(
-                          imageUrl: 'https://wearereading20200721193701.azurewebsites.net/Images/BookCovers/$coverPhotoId',
+                        child: widget.coverPhotoId != null && widget.coverPhotoId != '' ? CachedNetworkImage(
+                          imageUrl: 'https://wearereading20200721193701.azurewebsites.net/Images/BookCovers/${widget.coverPhotoId}',
                           fit: BoxFit.fill,
                           height: double.infinity,
                         ) : Container(color: Color.fromRGBO(251, 192, 45, 1)  ,)
@@ -73,7 +115,7 @@ class MyUploadWidget extends StatelessWidget {
                               CrossAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  '$title',
+                                  '${widget.title}',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
@@ -81,7 +123,7 @@ class MyUploadWidget extends StatelessWidget {
                                           true)),
                                 ),
                                 Text(
-                                  '$author',
+                                  '${widget.author}',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
@@ -89,7 +131,7 @@ class MyUploadWidget extends StatelessWidget {
                                           true)),
                                 ),
                                 Text(
-                                  'عدد النسخ : $copiesCount',
+                                  'عدد النسخ : ${widget.copiesCount}',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: ScreenUtil().setSp(15,
@@ -114,7 +156,7 @@ class MyUploadWidget extends StatelessWidget {
               children: <Widget>[
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () {},
+                    onPressed: _deleteBook,
                     child: Text(
                       'remove',
                       style: TextStyle(
@@ -135,7 +177,7 @@ class MyUploadWidget extends StatelessWidget {
                 Flexible(
                   child: RaisedButton(
                     onPressed: () {
-                      print(coverPhotoId);
+                      Navigator.of(context).pushNamed(AddBookScreen.routeName, arguments: {'isUpdate' : true, 'id': widget.id, 'title': widget.title, 'copiesCount' : widget.copiesCount, 'coverPhotoId' : widget.coverPhotoId, 'description' : widget.description, 'author': widget.author});
                     },
                     child: Text(
                       'update',

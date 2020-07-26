@@ -32,6 +32,8 @@ class MyApp extends StatelessWidget {
           update: (_, auth, previous) => GlobalData(
             auth.user,
             previous?.cities ?? [],
+            previous?.categories ?? [],
+
           ),
         ),
         ChangeNotifierProxyProvider<Auth, Books>(

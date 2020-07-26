@@ -52,7 +52,6 @@ class _HomeScreenState extends State<HomeScreen> with AlertsMixin {
   @override
   void didChangeDependencies() {
     if (!_firstCalled) {
-      if(_booksReference.books.length == 0)
       _fetchBooks();
       _firstCalled = true;
     }

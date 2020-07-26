@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:graduation/mixins/alerts_mixin.dart';
+import 'package:graduation/models/category.dart';
 import 'package:graduation/providers/auth.dart';
 import 'package:graduation/providers/books.dart';
+import 'package:graduation/providers/global_data.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-
+import 'package:path/path.dart' as p;
 import '../widgets/add_book_button_widget.dart';
 import '../widgets/add_photo_widget.dart';
 
@@ -59,37 +61,6 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
 //  }
 
 
-  final List<String> kCategories = [
-    'Science Fiction',
-    'satire',
-    'drama',
-    'Action and Adventure',
-    'Romance',
-    'mystery',
-    'horror',
-    'self help',
-    'guide',
-    'travel',
-    "children's",
-    'religious',
-    'science',
-    'history',
-    'math',
-    'anthologies',
-    'poetry',
-    'encyclopedia',
-    'dictionaries',
-    'comics',
-    'art',
-    'cookbooks',
-    'diaries',
-    'prayer books',
-    'series',
-    'trilogies',
-    'biographies',
-    'autobiographies',
-    'fantasy'
-  ];
 
 //  Future getImageFromDevice() async {
 //    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -127,7 +98,8 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
           _isLoading = true;
         });
         try {
-          await _booksReference.uploadBook(json.encode(_uploadData));
+          !_isUpdate ? await _booksReference.uploadBook(json.encode(_uploadData))
+          : await _booksReference.updateBook(_updateData);
           Navigator.of(context).pop();
 //          final parsedRegResponse = json.decode(regResponse);
 //          print(parsedRegResponse);
@@ -166,7 +138,8 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
       final response = await _authReference.uploadFile(filePath, true);
       print(response);
       print(json.decode(response));
-      _uploadData['coverPhotoId'] = json.decode(response)['imageId'];
+      _uploadData['coverPhotoId'] = json.decode(response)['imageId'] + p.extension(filePath);
+      print(p.extension(filePath));
     } on HttpException catch (e) {
       print(e);
     } catch (e) {
@@ -238,11 +211,46 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
   }
   Auth _authReference;
   Books _booksReference;
+  bool _isUpdate = false;
+  Map<String, dynamic> _updateData = {};
   @override
   void didChangeDependencies() {
+    _globalDataReference = Provider.of<GlobalData>(context, listen: false);
+
+    if (_globalDataReference.categories == null ||
+        _globalDataReference.categories.length == 0) {
+      _getCategories();
+    }
+    final args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
     _authReference = Provider.of<Auth>(context, listen: false);
     _booksReference = Provider.of<Books>(context, listen: false);
-    super.didChangeDependencies();
+    if(args != null && args != {} ) {
+      _isUpdate = true;
+      _updateData['id'] = args['id'];
+      _updateData['title'] = args['title'];
+      _updateData['copiesCount'] = args['copiesCount'];
+      _updateData['coverPhotoId'] = args['coverPhotoId'];
+      _updateData['description'] = args['description'];
+      _updateData['author'] = args['author'];
+      _updateData['categoryId'] = 1;
+      _updateData['rating'] = 4;
+      _updateData['statusId'] = 2;
+      _updateData['price'] = 0;
+
+    }
+
+      super.didChangeDependencies();
+  }
+  GlobalData _globalDataReference;
+
+  Future<void> _getCategories() async {
+    try {
+      await _globalDataReference.fetchCCategories();
+    } on HttpException catch (e) {
+      showErrorDialog(context, e.toString());
+    } catch (e) {
+      throw e;
+    }
   }
 
 
@@ -261,7 +269,7 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(251, 192, 45, 1),
-        title: Text("Add Book"),
+        title: Text(_isUpdate ? "Update book" : "Add Book"),
         centerTitle: true,
       ),
       body: Form(
@@ -279,7 +287,7 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
                 child: Stack(
                   alignment: Alignment.center,
                   children: <Widget>[
-                    AddPhotoAvatar(image: _pickedImage),
+                    AddPhotoAvatar(image: _pickedImage, photoId: _updateData['coverPhotoId'],),
                     if (isUploading)
                       Container(
                         width: 150.0,
@@ -309,6 +317,8 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
               InputText(
                 inputTextName: _bookTitle,
                 param: 'title',
+                updateData: _updateData['title'],
+
               ),
 
               SizedBox(
@@ -319,6 +329,8 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
               InputText(
                 inputTextName: _authorName,
                 param: 'author',
+                updateData: _updateData['author'],
+
               ),
               SizedBox(
                 height: ScreenUtil().setHeight(15),
@@ -328,6 +340,8 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
               InputText(
                 inputTextName: _noOfCopies,
                 param: 'copiesCount',
+                updateData: _updateData['copiesCount']?.toString(),
+
               ),
               SizedBox(
                 height: ScreenUtil().setHeight(15),
@@ -336,6 +350,8 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
               InputText(
                 inputTextName: 'About',
                 param: 'description',
+                updateData: _updateData['description'],
+
               ),
               SizedBox(
                 height: ScreenUtil().setHeight(15),
@@ -347,35 +363,39 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
                 child: Material(
                   elevation: 5.0,
                   borderRadius: BorderRadius.all(Radius.circular(30)),
-                  child: DropdownButtonFormField(
-                    validator: (val) {
-                      if (val == null) {
-                        return 'Please, Choose Book Category';
-                      }
-                      return null;
-                    },
-                    onSaved: (val) {
-//                      _addBookData[_bookCategory] = val;
-                    },
-                    onChanged: (val) {
-                      setState(() {
-                        _categoryValue = val;
-                        print(_categoryValue);
-                      });
-                    },
-                    value: _categoryValue,
-                    decoration: kInputDecoration.copyWith(
-                        labelText: "Categories",
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: ScreenUtil().setWidth(25),
-                          vertical: ScreenUtil().setHeight(1),
-                        )),
-                    items: kCategories.map((val) {
-                      return DropdownMenuItem(
-                        child: Text(val),
-                        value: val,
-                      );
-                    }).toList(),
+                  child: Selector<GlobalData, List<Category>>(
+                      selector: (_, globalData) => globalData.categories,
+                      builder: (_, categories, __) =>
+                     DropdownButtonFormField(
+                      validator: (val) {
+                        if (val == null) {
+                          return 'Please, Choose Book Category';
+                        }
+                        return null;
+                      },
+                      onSaved: (val) {
+                        _uploadData['cagegoryId'] = val;
+                      },
+                      onChanged: (val) {
+                        setState(() {
+                          _categoryValue = val;
+                          print(_categoryValue);
+                        });
+                      },
+                      value: _categoryValue,
+                      decoration: kInputDecoration.copyWith(
+                          labelText: "Categories",
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: ScreenUtil().setWidth(25),
+                            vertical: ScreenUtil().setHeight(1),
+                          )),
+                      items: categories.map((val) {
+                        return DropdownMenuItem(
+                          child: Text(val.name),
+                          value: val.id,
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
               ),
@@ -395,7 +415,7 @@ class _AddBookScreenState extends State<AddBookScreen> with AlertsMixin {
               )
                   : Buttons(
                 onPressed: () => _submit(),
-                buttonName: "Add",
+                buttonName: _isUpdate ? "Update" : "Add",
                 //  onPressed: ,
               )
             ],
@@ -419,9 +439,11 @@ var kInputDecoration = InputDecoration(
 class InputText extends StatelessWidget {
   String inputTextName = " ";
   String param;
+  String updateData;
   InputText({
     this.inputTextName,
-    this.param
+    this.param,
+    this.updateData
   });
   @override
   Widget build(BuildContext context) {
@@ -431,11 +453,12 @@ class InputText extends StatelessWidget {
         elevation: 5.0,
         borderRadius: BorderRadius.all(Radius.circular(30)),
         child: TextFormField(
+          initialValue: updateData ?? '',
           validator: (value) {
             if (value.isEmpty && inputTextName != 'About') {
               return 'Please, Enter $inputTextName';
             } else if (inputTextName == 'About') {
-              if(value == null || value == '')_uploadData[inputTextName] = 'No Data Entered ';
+              if(value == null || value == '')_uploadData['description'] = 'No description written';
               return null;
             } else
               return null;

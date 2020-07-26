@@ -1,13 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 class AddPhotoAvatar extends StatelessWidget {
   const AddPhotoAvatar({
     Key key,
     @required File image,
+   String photoId
   })  : _image = image,
+        _photoId = photoId,
         super(key: key);
 
   final File _image;
+  final String _photoId;
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +29,12 @@ class AddPhotoAvatar extends StatelessWidget {
           ),
         ],
       ),
-      child: CircleAvatar(
+      child: _photoId == null? CircleAvatar(
         radius: 80,
         backgroundColor: Colors.white,
         child: ClipOval(
           child: _image == null
-              ? Image.asset(
+              ?  Image.asset(
             'assets/images/photo.png',
             width: 100,
             height: 100,
@@ -42,6 +46,12 @@ class AddPhotoAvatar extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
+      ) : CircleAvatar(
+        radius: 80,
+        backgroundImage: CachedNetworkImageProvider(
+       'https://wearereading20200721193701.azurewebsites.net/Images/BookCovers/$_photoId',
+
+        ) ,
       ),
     );
   }
